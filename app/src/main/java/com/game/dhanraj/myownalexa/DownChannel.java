@@ -9,10 +9,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.game.dhanraj.myownalexa.Alarm.AlarmReceiver;
 import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
+import com.game.dhanraj.myownalexa.DatabaseForAlarmAndTimer.DataBase;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 
 import org.json.JSONArray;
@@ -20,12 +23,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -55,6 +62,7 @@ public class DownChannel extends Service {
     public SendingAudio sendingAudio;
     public PendingIntent pending;
     public Calendar calendar2;
+    private DataBase db;
 
 
 
@@ -68,13 +76,9 @@ public class DownChannel extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("gat", "Launched");
         //ek baar dekh lena poorana code bhi aur naye ko compare karke
-
-
         //ye isliye dala hai ki execute kar paye na ki enqueue
 
                 openDownChannel();
-
-
        // return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
@@ -87,6 +91,7 @@ public class DownChannel extends Service {
         sendingAudio  = new SendingAudio();
         calendar2 = Calendar.getInstance();
 
+        db = new DataBase(DownChannel.this);
     }
 
    /* @Override
@@ -165,17 +170,11 @@ public class DownChannel extends Service {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(DownChannel.this, "DownChannel pe Response aya hai", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(DownChannel.this, "DownChannel has been established", Toast.LENGTH_SHORT).show();
                         }
                     });
 
 
-                    // Log.d("Downchannel",response.body().string());
-                    Headers headers = response.headers();
-                    Log.d("CheckTheResponseHere", "startDownchannel: " + response.code() + ", " + response.protocol().name() + ", length:" + response.body().contentLength());
-                    for (int i = 0; i < headers.size(); i++) {
-                        Log.d("HeaderResponse", " " + headers.name(i) + ": " + headers.value(i));
-                    }
                   //  StringBuilder stringBuilder = new StringBuilder();
 
 
@@ -191,9 +190,6 @@ public class DownChannel extends Service {
                          //   stringBuilder.append(line);
                              boolean checkJson = isJSONValid(line);
 
-//                            new AsyncTask<Void,Void,Void>(){
-//                                @Override
-//                                protected Void doInBackground(Void... params) {
                                     if(checkJson==true)
                                     {
                                         try {
@@ -205,14 +201,15 @@ public class DownChannel extends Service {
                                             String name = header.getString("name");
                                             if(name.equals("StopCapture") && namespace.equals("SpeechRecognizer"))
                                             {
-                                              //  sendingAudio.stopListening();
+                                                sendMessage();
                                             }else if(name.equals("SetAlert") && namespace.equals("Alerts"))
                                             {
                                                 String type =  payload.getString("type");
                                                 if(type.equals("ALARM"))
                                                 {
-                                                    /*Intent intet = new Intent(DownChannel.this, AlarmReceiver.class);
+                                                    Intent intet = new Intent(DownChannel.this, AlarmReceiver.class);
                                                     String scheduledTime = payload.getString("scheduledTime");
+                                                    String TYPE = payload.getString("type");
                                                     // Calendar calendar = javax.xml.bind.DatatypeConverter.parseDateTime(scheduledTime);
                                                     //"yyyy-MM-dd'T'HH:mm:ss.SSSZ",yyyy-MM-dd'T'HH:mm:ss'
 
@@ -233,6 +230,7 @@ public class DownChannel extends Service {
                                                         int minute = calendar.get(Calendar.MINUTE);
                                                         int year = calendar.get(Calendar.YEAR);
                                                         int AMorPM = calendar.get(Calendar.AM_PM);
+                                                      //  calendar.set(Calendar.HOUR,calendar.get(Calendar.HOUR)-7);
                                                         if(hour<=0)
                                                         {
                                                             hour = 12+hour;
@@ -242,14 +240,23 @@ public class DownChannel extends Service {
                                                                 AMorPM = 1;
                                                         }
 
-                                                        calendar2.set(Calendar.HOUR,hour);
+                                                     /*   calendar2.set(Calendar.HOUR,hour);
                                                         calendar2.set(Calendar.MINUTE,minute);
-                                                        calendar2.set(Calendar.AM_PM,AMorPM);
+                                                        calendar2.set(Calendar.AM_PM,AMorPM);*/
+                                                        String amOrpm = AMorPM==1? "pm":"am";
+                                                        String min = String.valueOf(minute);
+                                                        if(minute/10==0)
+                                                        {
+                                                          min = "0"+min;
+                                                        }
+                                                        String myTime = String.valueOf(hour)+" : "+min + "  "+ amOrpm;
 
                                                         intet.putExtra("alarm","alarm on");
+                                                        db.addAlarm(myTime,TYPE,calendar.getTimeInMillis());
+                                                        int pendingId = (int) (calendar.getTimeInMillis()/10000);
 
                                                         Log.d("mywholeTime",hour+","+minute+","+year+","+calendar.get(Calendar.AM_PM));
-                                                        pending = PendingIntent.getBroadcast(DownChannel.this,0,intet,0);
+                                                        pending = PendingIntent.getBroadcast(DownChannel.this,pendingId,intet,PendingIntent.FLAG_ONE_SHOT);
                                                         //calendar2 use karna tha lekin calendar use kar raha hu
                                                         alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pending);
 
@@ -258,7 +265,6 @@ public class DownChannel extends Service {
                                                         e.printStackTrace();
                                                         Log.d("ParsingException","DownnChannelException");
                                                     }
-                                                    //  Log.d("shashank",dhanraj);*/
 
                                                 }
                                             }
@@ -268,43 +274,19 @@ public class DownChannel extends Service {
                                         }
                                     }
 
-                                //    return null;
-                            //    }
-                        //    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                             Log.d("alarm",line);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-             //       Log.d("stringBuilder",stringBuilder.toString());
-                   //  Log.d("dhanrajDownChannel", "Response: " + buffer.toString());
-                  /*  new AsyncTask<Void, Void, Void>(){
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            SendSynchronizeEvent();
-                            return null;
-                        }
-                    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-*/
-                      /*try {
-                        Headers headers = response.headers();
-                        Log.d("CheckTheResponseHere", "startDownchannel: " + response.code() + ", " + response.protocol().name() + ", length:" + response.body().contentLength());
-                        for (int i = 0; i < headers.size(); i++) {
-                            Log.d("HeaderResponse", " " + headers.name(i) + ": " + headers.value(i));
-                        }
-                        Buffer buffer = new Buffer();
-                        while (!response.body().source().exhausted()) {
-                            long count = response.body().source().read(buffer, 8192);
-                            Log.d("count ", count + " " + buffer.toString());
-                        }
-                        // listener.onConnected(response.isSuccessful());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        // downchannelThread.interrupt();
-                    }*/
+
 
                 }
             });
+
+            Intent dialogIntent = new Intent(DownChannel.this, SendingAudio.class);
+            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(dialogIntent);
         }
 
     }
@@ -454,18 +436,12 @@ public class DownChannel extends Service {
        }
     }
     private void SendPingRequest() {
+        Log.d("ping request","method");
         OkHttpClient client = getOkhttp();
          String accesstoken = MainActivity.getAccessToken(DownChannel.this);
         if(accesstoken==null)
             SendPingRequest();
         else{
-
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(DownChannel.this, "PingRequest has been sent", Toast.LENGTH_SHORT).show();
-                }
-            });
 
             final Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/ping")
@@ -481,7 +457,12 @@ public class DownChannel extends Service {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(DownChannel.this, "PingRequest is successfully sent.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             });
 
@@ -492,8 +473,13 @@ public class DownChannel extends Service {
                 }
             }, 4 * 60 * 1000);
         }
+    }
 
-
+    private void sendMessage() {
+        Intent intent = new Intent("my-event");
+        // add data
+        intent.putExtra("message", "stop");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
 

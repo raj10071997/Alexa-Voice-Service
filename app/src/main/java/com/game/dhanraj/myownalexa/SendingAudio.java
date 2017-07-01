@@ -6,8 +6,10 @@ import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
@@ -19,17 +21,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.game.dhanraj.myownalexa.Alarm.AlarmReceiver;
 import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
 import com.game.dhanraj.myownalexa.RecordAudio.RecordAudioinBytes;
 import com.game.dhanraj.myownalexa.RecordAudio.RecorderConstants;
@@ -78,7 +82,7 @@ public class SendingAudio extends AppCompatActivity {
     private Button btn;
     private recorderView record;
     private RecorderConstants recorderConstants;
-    private RecordAudioinBytes recordAudioinBytes;
+    public  RecordAudioinBytes recordAudioinBytes;
     private static final int AUDIO_RATE = 16000;
     private String myresponse;
     public  String tokenfrompayload;
@@ -88,6 +92,7 @@ public class SendingAudio extends AppCompatActivity {
     public boolean checkRecordButton = true;
     public DownChannel down;
     private PendingIntent pendingIntent;
+    private TextView stateofbtn;
     private AlarmManager alarmManager;
 
 
@@ -96,7 +101,7 @@ public class SendingAudio extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.send_audio);
 
-        btn = (Button) findViewById(R.id.stopalarm);
+       /* btn = (Button) findViewById(R.id.stopalarm);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,53 +114,66 @@ public class SendingAudio extends AppCompatActivity {
 
                 sendBroadcast(intet);
             }
-        });
+        });*/
+
+        stateofbtn = (TextView) findViewById(R.id.stateofbutton);
 
         down = new DownChannel();
         asyncDialog = new ProgressDialog(SendingAudio.this);
 
         mediaPlayer = new MediaPlayer();
         record = (recorderView) findViewById(R.id.sendAudiobtn);
-        
-        record.setOnClickListener(new View.OnClickListener() {
 
-
+        record.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                if ( ContextCompat.checkSelfPermission(SendingAudio.this,
-                        Manifest.permission.RECORD_AUDIO  )
-                        != PackageManager.PERMISSION_GRANTED) {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN ) {
+                    if ( ContextCompat.checkSelfPermission(SendingAudio.this, Manifest.permission.RECORD_AUDIO  )
+                            != PackageManager.PERMISSION_GRANTED) {
 
 
-                    ActivityCompat.requestPermissions(SendingAudio.this,
-                            new String[]{Manifest.permission.RECORD_AUDIO},
-                            2);
-                }
-                else {
-                    ConnectivityManager connectivityManager
-                            = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-                    if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
-                        if (recordAudioinBytes == null) {
+                        ActivityCompat.requestPermissions(SendingAudio.this,
+                                new String[]{Manifest.permission.RECORD_AUDIO},
+                                2);
+                    }
+                    else {
+                        ConnectivityManager connectivityManager
+                                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                        if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
 
-                            //if mediaplayer is not playing
-                            if (!mediaPlayer.isPlaying() && checkRecordButton){
-                                send();
-                                Toast.makeText(SendingAudio.this, "Speak", Toast.LENGTH_SHORT).show();
-                                checkRecordButton = false;
+                            if (recordAudioinBytes == null) {
+                                //if mediaplayer is not playing
+                                if (!mediaPlayer.isPlaying() && checkRecordButton){
+                                    send();
+                                    Toast.makeText(SendingAudio.this, "Speak", Toast.LENGTH_SHORT).show();
+                                    checkRecordButton = false;
+                                }
+
+
+
                             }
-
-
-
-                        } else {
-                            stopListening();
-                        }
-                    } else
-                        Toast.makeText(SendingAudio.this, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
+                        } else
+                            Toast.makeText(SendingAudio.this, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
+                    }
+                    return true;
+                }else if(event.getAction() == MotionEvent.ACTION_UP)
+                {
+                   // stateofbtn.setText("Wait");
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    stopListening();
+                    checkRecordButton=true;
                 }
 
+                return false;
             }
         });
+        
+
     }
 
     @Override
@@ -171,7 +189,7 @@ public class SendingAudio extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 Intent i = new Intent(SendingAudio.this, MyAlarm.class);
-//                startActivity(i);
+                startActivity(i);
                 return true;
 
             default:
@@ -196,7 +214,14 @@ public class SendingAudio extends AppCompatActivity {
                             checkRecordButton = false;
                         }
                     } else {
+                     //   stateofbtn.setText("Wait");
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         stopListening();
+                        checkRecordButton=true;
                     }
 
                 } else {
@@ -222,6 +247,9 @@ public class SendingAudio extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter("my-event"));
 //        if(mediaPlayer.isPlaying())
 //        {
 //            mediaPlayer.stop();
@@ -229,8 +257,27 @@ public class SendingAudio extends AppCompatActivity {
 //        }
     }
 
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            if(checkRecordButton)
+            stopListening();
+            Log.d("receiver", "Got message " );
+        }
+    };
+
+    @Override
+    protected void onPause() {
+        // Unregister since the activity is not visible
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        super.onPause();
+    }
+
     private void send() {
-        PressTheButton=true;
+        //while(mediaPlayer.isPlaying());
+
+        //PressTheButton=true;
         recorderConstants = new RecorderConstants(AUDIO_RATE);
         if(recordAudioinBytes==null){
             recordAudioinBytes = new RecordAudioinBytes();
@@ -266,7 +313,8 @@ public class SendingAudio extends AppCompatActivity {
             event.put("header",header);
             event.put("payload",payload);
             payload.put("format","AUDIO_L16_RATE_16000_CHANNELS_1");
-            payload.put("profile","NEAR_FIELD");
+ //           payload.put("profile","NEAR_FIELD");
+            payload.put("profile","FAR_FIELD");
 
             p.put("event",event);
         }catch (JSONException e)
@@ -307,6 +355,12 @@ public class SendingAudio extends AppCompatActivity {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     Log.d("failurehaibhai","failed");
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            stateofbtn.setText("");
+                        }
+                    });
                     checkRecordButton=true;
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
@@ -325,13 +379,17 @@ public class SendingAudio extends AppCompatActivity {
                     }
                     try {
                         if (getBoundary(response) != null) {
+                          //  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
                             ByteArrayDataSource ds = new ByteArrayDataSource(response.body().byteStream(), "multipart/form-data");
                             //response.body().bytestream() doesn't closes the stream.
                             //closing it for not leaking resources otherwise it may ultimately cause the application to slow down or crash.
                             response.body().close();
                             MimeMultipart multipart = null;
+                            Boolean checkforExpectSpeech = false;
                             try {
                                 multipart = new MimeMultipart(ds);
+                                Log.d("MainContentType",multipart.getContentType());
+
                                 for (int i = 0; i < multipart.getCount(); i++) {
                              /*   if(multipart.getBodyPart(i)==null)
                                     break;*/
@@ -368,6 +426,8 @@ public class SendingAudio extends AppCompatActivity {
 
                                                 long timeoutInMilliseconds = payload.getLong("timeoutInMilliseconds");
                                                 Log.d("timeoutmsec", String.valueOf((timeoutInMilliseconds)));
+                                                checkforExpectSpeech = true;
+                                                // send();
 
                                             } else if (name.equals("Speak") && namespace.equals("SpeechSynthesizer")) {
                                                 Log.d("token", "SpeakDirective");
@@ -388,7 +448,7 @@ public class SendingAudio extends AppCompatActivity {
                                     } else if (contentType.equals("application/json")) {
                                         Log.d("alert", bodypart.getContentType());
 
-                                    } else {
+                                    } else if (contentType.equals("application/octet-stream") ){
 
                                         byte[] b = IOUtils.toByteArray(bodypart.getInputStream());
 
@@ -396,6 +456,11 @@ public class SendingAudio extends AppCompatActivity {
 
                                     }
 
+                                }
+                                if(checkforExpectSpeech)
+                                {
+                                    send();
+                                    checkforExpectSpeech=false;
                                 }
 
                             } catch (MessagingException e) {
@@ -409,7 +474,14 @@ public class SendingAudio extends AppCompatActivity {
                     }catch (Exception e){
 
                     }finally {
-                        checkRecordButton=true;
+                        //checkRecordButton=true;
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                              //  stateofbtn.setVisibility(View.INVISIBLE);\
+                                stateofbtn.setText("");
+                            }
+                        });
                     }
 
 
@@ -654,9 +726,11 @@ public class SendingAudio extends AppCompatActivity {
             mediaPlayer.prepare();
 
 
+
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
+                    stateofbtn.setText("");
                     asyncDialog.setMessage("playing");
                     asyncDialog.show();
                 }
@@ -664,13 +738,10 @@ public class SendingAudio extends AppCompatActivity {
 
             mediaPlayer.start();
 
-            while(mediaPlayer.isPlaying())
-            {
-            }
-
+            while(mediaPlayer.isPlaying());
 
             try {
-                Thread.sleep(500);
+                Thread.sleep(250);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -685,11 +756,14 @@ public class SendingAudio extends AppCompatActivity {
                 @Override
                 public void run() {
                asyncDialog.dismiss();
+                 //   stateofbtn.setVisibility(View.INVISIBLE);
                 }
             });
 
+
+
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -833,6 +907,8 @@ public class SendingAudio extends AppCompatActivity {
             }
         } else {
             Log.i("randuwa", "Body");
+           String printmy =  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
+            Log.d("system",printmy);
         }
         return boundary;
 
@@ -848,9 +924,16 @@ public class SendingAudio extends AppCompatActivity {
         @Override
         public void writeTo(BufferedSink sink) throws IOException {
             //recordAudioinBytes.isPausing() changing this
-         //   while(recordAudioinBytes!=null && !recordAudioinBytes.isPausing())
+           // while(recordAudioinBytes!=null && !recordAudioinBytes.isPausing())
             while(recordAudioinBytes!=null)
             {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //  stateofbtn.setVisibility(View.VISIBLE);
+                        stateofbtn.setText("Listening...");
+                    }
+                });
                 if(recordAudioinBytes!=null){
                     final float rmsdb = recordAudioinBytes.getRmsdb();
                     if(record != null) {
@@ -868,7 +951,8 @@ public class SendingAudio extends AppCompatActivity {
                 }
 
                 try {
-                    Thread.sleep(25);
+                    //changed from 25 to 250
+                    Thread.sleep(250);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -876,13 +960,20 @@ public class SendingAudio extends AppCompatActivity {
             //changed the code here
 
   //uncomment kia hai change kia hai
-         //   stopListening();
+          //  stopListening();
 
         }
     };
 
     public void stopListening(){
       //  PressTheButton=false;
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                stateofbtn.setText("wait...");
+            }
+        });
+
         if(recordAudioinBytes != null) {
             recordAudioinBytes.stop();
             recordAudioinBytes.release();

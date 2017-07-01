@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    
 
     <application
         android:allowBackup="true"
@@ -59,6 +60,7 @@
                     android:scheme="https"/>
             </intent-filter>
         </activity>
+        <activity android:name=".Alarm.MyAlarm"/>
         <activity
             android:name="com.amazon.identity.auth.device.workflow.WorkflowActivity"
             android:allowTaskReparenting="true"

@@ -9,37 +9,31 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="#8e24aa"
     tools:context="com.game.dhanraj.myownalexa.MainActivity">
+
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/btn"
+        android:src="@drawable/login"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn"
-        android:layout_below="@+id/text"
-        android:text="login"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_below="@+id/btn"
-        android:text="Establish DownChannel"
-        android:id="@+id/post"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/next"
-        android:text="sendAudio"
-        android:layout_below="@+id/post"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/sendtextbtn"
-        android:text="Send Text"
-        android:layout_below="@+id/next"
-        />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Login to get the access token and \n establish the DownChannel."
+        android:textSize="20dp"
+        android:textStyle="italic"
+        android:textColor="#FFFFFF"/>
+
+
+
 
 </RelativeLayout>

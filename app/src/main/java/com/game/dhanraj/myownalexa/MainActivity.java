@@ -8,11 +8,12 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import com.amazon.identity.auth.device.api.authorization.AuthorizeResult;
 import com.amazon.identity.auth.device.api.authorization.ScopeFactory;
 import com.amazon.identity.auth.device.api.workflow.RequestContext;
 import com.game.dhanraj.myownalexa.AccessConstant.CodeVerifierandChallengeMethods;
+import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 import com.google.gson.Gson;
 
@@ -36,6 +38,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
     private Button btn, pst,nxtaudio;
+    private CircleImageView Loginbtn;
 
     private static String REFRESH_TOKEN;
     private static String ACCESS_TOKEN;
@@ -72,14 +76,14 @@ public class MainActivity extends AppCompatActivity {
     private static String myresponse;
     public static String CLIENTID;
 
-    public DownChannel dwn;
+    public static DownChannel dwn;
 
     public final static String PREF_ACCESS_TOKEN = "access_token_042017";
     public final static String PREF_REFRESH_TOKEN = "refresh_token_042017";
     public final static String PREF_TOKEN_EXPIRES = "token_expires_042017";
 
     private ProgressDialog progressDialog;
-    private boolean forDownChannel;
+    private static boolean forDownChannel,refreshToken;
     public static boolean CheckInternetConnection,DownChannelestablished;
 
     @Override
@@ -103,12 +107,13 @@ public class MainActivity extends AppCompatActivity {
                     + "SHA-256" + " algorithm.", e);
         }
 
+        refreshToken= true;
         DownChannelestablished = true;
         dwn = new DownChannel();
         //SharedPreferences perf = Util.getPrefernces(mContext);
 
-        btn = (Button) findViewById(R.id.btn);
-        btn.setOnClickListener(new View.OnClickListener() {
+        Loginbtn = (CircleImageView) findViewById(R.id.btn);
+        Loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ConnectivityManager connectivityManager
@@ -121,27 +126,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
-        pst = (Button) findViewById(R.id.post);
-        pst.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  dwn.openDownChannel();
-            }
-        });
-
-        nxtaudio=(Button)findViewById(R.id.next);
-        nxtaudio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this,SendingAudio.class);
-                startActivity(i);
-            }
-        });
-
-
-
 
 
         }
@@ -190,22 +174,53 @@ public class MainActivity extends AppCompatActivity {
         mRequestContext.onResume();
     }
 
-    private static void doPostRequest(RequestBody form) {
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+       // Toast.makeText(<Context>, "Stopping service", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(MainActivity.this, DownChannel.class);
+        MainActivity.this.stopService(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main2, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent i = new Intent(MainActivity.this, MyAlarm.class);
+                startActivity(i);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    private static void doPostRequest(final RequestBody form,final String checkRefreshToken) {
 
         OkHttpClient okclient = getOkhttp();
         Request request = new Request.Builder()
                 .url("https://api.amazon.com/auth/O2/token")
                 .post(form)
                 .build();
+        Response response=null;
 
-        final RequestBody frm = form;
 
         okclient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 call.cancel();
                 Log.d("accessToken","failed");
-                doPostRequest(frm);
+                doPostRequest(form,checkRefreshToken);
             }
 
             @Override
@@ -219,15 +234,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent st = new Intent(myContext,DownChannel.class);
                 myContext.startService(st);
 
-
-
-
-
-               /* try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }*/
+                if(checkRefreshToken!=null)
+                    refreshToken = false;
 
             }
         });
@@ -287,13 +295,6 @@ public class MainActivity extends AppCompatActivity {
             final String clientId = authorizeResult.getClientId();
             CLIENTID = clientId;
 
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(MainActivity.this, authorizationCode+","+redirectUri, Toast.LENGTH_SHORT).show();
-                }
-            });
-
                     SharedPreferences.Editor  preferences = Util.getPrefernces(mContext).edit();
                     preferences.putString("clientID",clientId);
                     preferences.apply();
@@ -304,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
                             .add("client_id", clientId)
                             .add("code_verifier", codeVerifier)
                             .build();
-                    doPostRequest(formBody);
+                    doPostRequest(formBody,null);
                   //  SaveToken();
 
                    // stopService(DownChannel.class);
@@ -372,6 +373,8 @@ public class MainActivity extends AppCompatActivity {
                 if (preferences.contains(PREF_REFRESH_TOKEN)) {
                     Log.d("expired","doesnotcontains");
                     getRefreshToken(context, preferences.getString(PREF_REFRESH_TOKEN, ""));
+                    while(refreshToken);
+                    refreshToken=true;
                     return preferences.getString(PREF_ACCESS_TOKEN, null);
                 }
             }
@@ -389,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
                 .add("refresh_token", string)
                 .add("client_id", Util.getPrefernces(context).getString("clientId",""))
                 .build();
-        doPostRequest(formBody);
+        doPostRequest(formBody,"RefreshToken");
 
     }
 

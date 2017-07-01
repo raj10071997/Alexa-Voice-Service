@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="6dip">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/circleimage"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_alarm_on_black_24dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time"
+        android:textSize="25dp"
+        android:layout_toRightOf="@+id/circleimage"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:textStyle="italic"
+        android:id="@+id/textoftime"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+       android:layout_below="@+id/textoftime"
+        android:text="TYPE"
+        android:textStyle="italic"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/circleimage"
+        android:id="@+id/textType"
+        android:textSize="15dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="id"
+        android:visibility="invisible"
+        android:id="@+id/myId"
+        android:layout_alignParentRight="true"/>
+
+</RelativeLayout>
