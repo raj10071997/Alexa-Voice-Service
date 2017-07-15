@@ -906,7 +906,7 @@ public class SendingAudio extends AppCompatActivity {
                 boundary = matcher.group(1);
             }
         } else {
-            Log.i("randuwa", "Body");
+            Log.i("notBoundary", "Body");
            String printmy =  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
             Log.d("system",printmy);
         }
