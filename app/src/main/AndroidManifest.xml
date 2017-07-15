@@ -26,8 +26,8 @@
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.BATTERY_LOW"/>
+              <!--  <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BATTERY_LOW"/>-->
                 <action android:name="android.intent.action.PACKAGE_FIRST_LAUNCH"/>
                 <!--
                 <action android:name="android.intent.action.REBOOT"/>
