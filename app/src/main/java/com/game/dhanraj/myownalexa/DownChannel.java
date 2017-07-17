@@ -18,6 +18,9 @@ import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
 import com.game.dhanraj.myownalexa.DatabaseForAlarmAndTimer.DataBase;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,6 +66,7 @@ public class DownChannel extends Service {
     public PendingIntent pending;
     public Calendar calendar2;
     private DataBase db;
+    public TokenHandler tokenHandler;
 
 
 
@@ -77,8 +81,8 @@ public class DownChannel extends Service {
         Log.d("gat", "Launched");
         //ek baar dekh lena poorana code bhi aur naye ko compare karke
         //ye isliye dala hai ki execute kar paye na ki enqueue
-
-                openDownChannel();
+        tokenHandler.getAccessToken(TokenHandler.DownChannelCase1);
+               // openDownChannel();
        // return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
@@ -90,16 +94,35 @@ public class DownChannel extends Service {
         calendar = Calendar.getInstance();
         sendingAudio  = new SendingAudio();
         calendar2 = Calendar.getInstance();
-
+        EventBus.getDefault().register(this);
+        tokenHandler = new TokenHandler(this);
         db = new DataBase(DownChannel.this);
     }
 
-   /* @Override
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onMessageEvent(MessageEvent event){
+//        Log.d(TAG,event.message);
+        switch (event.event){
+            case TokenHandler.DownChannelCase1:
+                openDownChannel(event.message);
+                break;
+            case TokenHandler.DownChannelCase2:
+                SendSynchronizeEvent(event.message);
+                break;
+            case TokenHandler.DownChannelCase3:
+                SendPingRequest(event.message);
+                break;
+        }
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
-    }*/
+        EventBus.getDefault().unregister(this);
+    }
 
-    public void openDownChannel() {
+
+    public void openDownChannel(final String accessToken) {
 
 
 
@@ -110,7 +133,7 @@ public class DownChannel extends Service {
                .readTimeout(0, TimeUnit.MILLISECONDS)
                .writeTimeout(0, TimeUnit.MILLISECONDS)
                .build();
-        String accesstoken = MainActivity.getAccessToken(DownChannel.this);
+       // String accesstoken = MainActivity.getAccessToken(DownChannel.this);
 
         try {
             Thread.sleep(250);
@@ -118,7 +141,7 @@ public class DownChannel extends Service {
             e.printStackTrace();
         }
 
-        if(accesstoken==null)
+        if(accessToken==null)
         {
             Log.d("openDownChannel","failed");
            // openDownChannel();
@@ -128,7 +151,7 @@ public class DownChannel extends Service {
                     Toast.makeText(DownChannel.this, "Loginfailed", Toast.LENGTH_SHORT).show();
                 }
             });
-            openDownChannel();
+            openDownChannel(accessToken);
 
            /* MainActivity main = new MainActivity();
             main.intiLogi();*/
@@ -138,22 +161,15 @@ public class DownChannel extends Service {
             final Request request = new Request.Builder()
                     .url(DchannelURL)
                     .get()
-                    .addHeader("authorization","Bearer "+accesstoken)
+                    .addHeader("authorization","Bearer "+accessToken)
                     .build();
 
-              /*  Response response = null;
-                try {
-                    response = client.newCall(request).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-             */
 
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     Log.d("downchannelfailed","failureagain");
-                    openDownChannel();
+                    openDownChannel(accessToken);
                 }
 
                 @Override
@@ -161,7 +177,8 @@ public class DownChannel extends Service {
                     new AsyncTask<Void, Void, Void>(){
                         @Override
                         protected Void doInBackground(Void... params) {
-                            SendSynchronizeEvent();
+                          //  SendSynchronizeEvent();
+                            tokenHandler.getAccessToken(TokenHandler.DownChannelCase2);
                             return null;
                         }
 
@@ -307,7 +324,7 @@ public class DownChannel extends Service {
     }
 
 
-    private void SendSynchronizeEvent() {
+    private void SendSynchronizeEvent(final String accessToken) {
 
         JSONObject p = new JSONObject();
         JSONObject event = new JSONObject();
@@ -394,10 +411,10 @@ public class DownChannel extends Service {
             e.printStackTrace();
         }
         p.toString();
-        String accesstoken = MainActivity.getAccessToken(DownChannel.this);
 
-        if(accesstoken==null)
-            SendSynchronizeEvent();
+
+        if(accessToken==null)
+            SendSynchronizeEvent(accessToken);
         else
         {
             OkHttpClient okclient = getOkhttp();
@@ -410,7 +427,7 @@ public class DownChannel extends Service {
             //changed the endpoint here also us-eu
             Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/events")
-                    .addHeader("Authorization", "Bearer " + accesstoken)
+                    .addHeader("Authorization", "Bearer " + accessToken)
                     .addHeader("content-type","multipart/form-data")
                     .addHeader("boundary","--gc0p4Jq0M2Yt08jU534c0p--")
                     .post(requestBody.build())
@@ -422,37 +439,38 @@ public class DownChannel extends Service {
                 public void onFailure(Call call, IOException e) {
                     call.cancel();
                     Log.d("synchronizefailed","mda");
-                    SendSynchronizeEvent();
+                    SendSynchronizeEvent(accessToken);
                 }
 
                 @Override
                 public void onResponse(Call call, final Response response) throws IOException {
 
                     //not necessary ki yahi pe first time sendpingrequest ko call kia jaye
-                    SendPingRequest();
+                    //SendPingRequest();
+                    tokenHandler.getAccessToken(TokenHandler.DownChannelCase3);
                 }
         });
 
        }
     }
-    private void SendPingRequest() {
+    private void SendPingRequest(final String accessToken) {
         Log.d("ping request","method");
         OkHttpClient client = getOkhttp();
-         String accesstoken = MainActivity.getAccessToken(DownChannel.this);
-        if(accesstoken==null)
-            SendPingRequest();
+
+        if(accessToken==null)
+            SendPingRequest(accessToken);
         else{
 
             final Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/ping")
                     .get()
-                    .addHeader("authorization","Bearer "+accesstoken)
+                    .addHeader("authorization","Bearer "+accessToken)
                     .build();
 
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    SendPingRequest();
+                    SendPingRequest(accessToken);
                 }
 
                 @Override
@@ -469,7 +487,7 @@ public class DownChannel extends Service {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    SendPingRequest();
+                    SendPingRequest(accessToken);
                 }
             }, 4 * 60 * 1000);
         }
