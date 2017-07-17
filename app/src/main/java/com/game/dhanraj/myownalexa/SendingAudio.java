@@ -940,7 +940,11 @@ public class SendingAudio extends AppCompatActivity {
                 boundary = matcher.group(1);
             }
         } else {
+<<<<<<< HEAD
             Log.i("noboundary", "Body");
+=======
+            Log.i("notBoundary", "Body");
+>>>>>>> c499aebfcb1106d7c96c9917429d9cc86d8e6dc5
            String printmy =  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
             Log.d("system",printmy);
         }
