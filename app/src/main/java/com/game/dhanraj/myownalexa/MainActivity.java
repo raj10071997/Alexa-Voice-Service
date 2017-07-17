@@ -32,6 +32,7 @@ import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 import com.google.gson.Gson;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,6 +55,7 @@ import static com.game.dhanraj.myownalexa.AccessConstant.CodeVerifierandChalleng
 //The authorization code changes everytime you open the app for the first time so you have to get the authorization code everytime you login till your access
 public class MainActivity extends AppCompatActivity {
 
+    public TokenHandler tokenHanlder;
     private RequestContext mRequestContext;
     public  static Context mContext;
     public static Context myContext;
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         refreshToken= true;
         DownChannelestablished = true;
         dwn = new DownChannel();
+        tokenHanlder = new TokenHandler(myContext);
         //SharedPreferences perf = Util.getPrefernces(mContext);
 
         Loginbtn = (CircleImageView) findViewById(R.id.btn);
@@ -134,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+      //  EventBus.getDefault().register(this);
 
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -175,6 +179,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+       // EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public void onDestroy()
     {
         super.onDestroy();
@@ -205,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private static void doPostRequest(final RequestBody form,final String checkRefreshToken) {
+    /*private static void doPostRequest(final RequestBody form,final String checkRefreshToken) {
 
         OkHttpClient okclient = getOkhttp();
         Request request = new Request.Builder()
@@ -240,16 +250,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*if(DownChannelestablished){
+        *//*if(DownChannelestablished){
             Intent st = new Intent(myContext,DownChannel.class);
             myContext.startService(st);
 
             DownChannelestablished=false;
-        }*/
+        }*//*
 
-    }
+    }*/
 
-    private static void saveToken(TokenResponse tokenResponse) {
+    public static void saveToken(TokenResponse tokenResponse) {
 
         REFRESH_TOKEN = tokenResponse.refresh_token;
         ACCESS_TOKEN = tokenResponse.access_token;
@@ -305,7 +315,8 @@ public class MainActivity extends AppCompatActivity {
                             .add("client_id", clientId)
                             .add("code_verifier", codeVerifier)
                             .build();
-                    doPostRequest(formBody,null);
+                  //  doPostRequest(formBody,null);
+                    tokenHanlder.doPostRequest(formBody,TokenHandler.FirstMainActivityDoPostRequest);
                   //  SaveToken();
 
                    // stopService(DownChannel.class);
@@ -357,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public static String getAccessToken(Context context) {
+    /*public static String getAccessToken(Context context) {
         SharedPreferences preferences = Util.getPrefernces(context);
         //if we have an access token
         if (preferences.contains(PREF_ACCESS_TOKEN)) {
@@ -394,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         doPostRequest(formBody,"RefreshToken");
 
-    }
+    }*/
 
     public boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);

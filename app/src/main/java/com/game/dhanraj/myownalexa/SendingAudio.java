@@ -41,6 +41,9 @@ import com.game.dhanraj.myownalexa.RecorderView.recorderView;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 
 import org.apache.commons.io.IOUtils;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -94,6 +97,7 @@ public class SendingAudio extends AppCompatActivity {
     private PendingIntent pendingIntent;
     private TextView stateofbtn;
     private AlarmManager alarmManager;
+    public TokenHandler tokenHandler;
 
 
     @Override
@@ -115,6 +119,8 @@ public class SendingAudio extends AppCompatActivity {
                 sendBroadcast(intet);
             }
         });*/
+
+       tokenHandler = new TokenHandler(this);
 
         stateofbtn = (TextView) findViewById(R.id.stateofbutton);
 
@@ -250,11 +256,35 @@ public class SendingAudio extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("my-event"));
-//        if(mediaPlayer.isPlaying())
-//        {
-//            mediaPlayer.stop();
-//          //  stopListening();
-//        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onMessageEvent(MessageEvent event){
+//        Log.d(TAG,event.message);
+        switch (event.event){
+            case TokenHandler.SendAudioRequest:
+                sendAudioRequest(requestBody,event.message);
+                break;
+            case TokenHandler.SendSpeechStartedEvent:
+                SendSpeechStartedEvent(tokenfrompayload,event.message);
+                break;
+            case TokenHandler.SendSpeechFinishedEvent:
+                SendSpeechFinishedEvent(tokenfrompayload,event.message);
+                break;
+        }
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -283,7 +313,8 @@ public class SendingAudio extends AppCompatActivity {
             recordAudioinBytes = new RecordAudioinBytes();
         }
         recordAudioinBytes.start();
-        sendAudioRequest(requestBody);
+        //sendAudioRequest(requestBody);
+        tokenHandler.getAccessToken(TokenHandler.SendAudioRequest);
 
     }
 
@@ -297,7 +328,7 @@ public class SendingAudio extends AppCompatActivity {
         return false;
     }
 
-    private void sendAudioRequest(RequestBody requestBody) {
+    private void sendAudioRequest(RequestBody requestBody,final String accessToken) {
         JSONObject p = new JSONObject();
         JSONObject event = new JSONObject();
         JSONObject header = new JSONObject();
@@ -321,9 +352,8 @@ public class SendingAudio extends AppCompatActivity {
         {
             e.printStackTrace();
         }
-        String accesstoken = MainActivity.getAccessToken(SendingAudio.this);
 
-        if(accesstoken==null)
+        if(accessToken==null)
         {
             Log.d("sendforrefreshtoken","refreshtoken");
          /* MainActivity main = new MainActivity();
@@ -344,7 +374,7 @@ public class SendingAudio extends AppCompatActivity {
 
             Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/events")
-                    .addHeader("Authorization", "Bearer " + accesstoken)
+                    .addHeader("Authorization", "Bearer " + accessToken)
                     .addHeader("content-type","multipart/form-data")
                     .addHeader("boundary","--gc0p4JppM2Yt08jU534c0p--")
                     .post(requestBdy.build())
@@ -378,8 +408,9 @@ public class SendingAudio extends AppCompatActivity {
                         //  Log.d("body",response.body().string());
                     }
                     try {
-                        if (getBoundary(response) != null) {
-                          //  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
+                      //  if (getBoundary(response) != null) {
+                        if(true){
+                            System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
                             ByteArrayDataSource ds = new ByteArrayDataSource(response.body().byteStream(), "multipart/form-data");
                             //response.body().bytestream() doesn't closes the stream.
                             //closing it for not leaking resources otherwise it may ultimately cause the application to slow down or crash.
@@ -388,6 +419,7 @@ public class SendingAudio extends AppCompatActivity {
                             Boolean checkforExpectSpeech = false;
                             try {
                                 multipart = new MimeMultipart(ds);
+
                                 Log.d("MainContentType",multipart.getContentType());
 
                                 for (int i = 0; i < multipart.getCount(); i++) {
@@ -512,8 +544,8 @@ public class SendingAudio extends AppCompatActivity {
             e.printStackTrace();
         }
         p.toString();
-        String accesstoken = MainActivity.getAccessToken(SendingAudio.this);
-
+      //  String accesstoken = MainActivity.getAccessToken(SendingAudio.this);
+        String accesstoken =null;
         if (accesstoken == null)
             sendExpectSpeechTimedOutEvent();
         else {
@@ -555,7 +587,7 @@ public class SendingAudio extends AppCompatActivity {
 
     }
 
-    private void SendSpeechFinishedEvent(String token) {
+    private void SendSpeechFinishedEvent(String token,String accessToken) {
         JSONObject p = new JSONObject();
         JSONObject event = new JSONObject();
         JSONObject header = new JSONObject();
@@ -574,10 +606,10 @@ public class SendingAudio extends AppCompatActivity {
             e.printStackTrace();
         }
         p.toString();
-        String accesstoken = MainActivity.getAccessToken(SendingAudio.this);
 
-        if (accesstoken == null)
-            SendSpeechFinishedEvent(token);
+
+        if (accessToken == null)
+           tokenHandler.getAccessToken(TokenHandler.SendSpeechFinishedEvent);
         else {
           //  Log.d("speechfinishedrequest","successful");
             OkHttpClient okclient = getOkhttp();
@@ -589,13 +621,13 @@ public class SendingAudio extends AppCompatActivity {
 
             Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/events")
-                    .addHeader("Authorization", "Bearer " + accesstoken)
+                    .addHeader("Authorization", "Bearer " + accessToken)
                     .addHeader("content-type", "multipart/form-data")
                     .addHeader("boundary", "--gc0p4Jq0M2Yt08jU534c0p--")
                     .post(requestBody.build())
                     .build();
 
-            final String TOKEN = token;
+
             okclient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -625,7 +657,7 @@ public class SendingAudio extends AppCompatActivity {
         }
     }
 
-    private void SendSpeechStartedEvent(String token) {
+    private void SendSpeechStartedEvent(String token,String accessToken) {
         JSONObject p = new JSONObject();
         JSONObject event = new JSONObject();
         JSONObject header = new JSONObject();
@@ -644,10 +676,10 @@ public class SendingAudio extends AppCompatActivity {
             e.printStackTrace();
         }
         p.toString();
-        String accesstoken = MainActivity.getAccessToken(SendingAudio.this);
+        //String accesstoken = MainActivity.getAccessToken(SendingAudio.this);
 
-        if (accesstoken == null)
-            SendSpeechStartedEvent(token);
+        if (accessToken == null)
+            tokenHandler.getAccessToken(TokenHandler.SendSpeechStartedEvent);
         else {
            // Log.d("speechstartedrequest","successful");
             OkHttpClient okclient = getOkhttp();
@@ -659,7 +691,7 @@ public class SendingAudio extends AppCompatActivity {
 
             Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/events")
-                    .addHeader("Authorization", "Bearer " + accesstoken)
+                    .addHeader("Authorization", "Bearer " + accessToken)
                     .addHeader("content-type", "multipart/form-data")
                     .addHeader("boundary", "--gc0p4Jq0M2Yt08jU534c0p--")
                     .post(requestBody.build())
@@ -722,7 +754,8 @@ public class SendingAudio extends AppCompatActivity {
             mediaPlayer.setDataSource(Mytemp.getPath());
             //sending speech started event
             if(tokenfrompayload!=null)
-                SendSpeechStartedEvent(tokenfrompayload);
+                tokenHandler.getAccessToken(TokenHandler.SendSpeechStartedEvent);
+               // SendSpeechStartedEvent(tokenfrompayload);
             mediaPlayer.prepare();
 
 
@@ -750,7 +783,8 @@ public class SendingAudio extends AppCompatActivity {
             mediaPlayer.stop();
             //sending speechFinish event
             if(tokenfrompayload!=null)
-                SendSpeechFinishedEvent(tokenfrompayload);
+                tokenHandler.getAccessToken(TokenHandler.SendSpeechFinishedEvent);
+                //SendSpeechFinishedEvent(tokenfrompayload);
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
@@ -831,7 +865,7 @@ public class SendingAudio extends AppCompatActivity {
 
     }
 
-    private void sendPlaybackStartedEvent(float percent) {
+   /* private void sendPlaybackStartedEvent(float percent) {
         JSONObject p = new JSONObject();
         JSONObject event = new JSONObject();
         JSONObject header = new JSONObject();
@@ -891,7 +925,7 @@ public class SendingAudio extends AppCompatActivity {
             });
 
         }
-    }
+    }*/
 
 
     public String getBoundary(Response response) throws IOException {
@@ -906,7 +940,7 @@ public class SendingAudio extends AppCompatActivity {
                 boundary = matcher.group(1);
             }
         } else {
-            Log.i("randuwa", "Body");
+            Log.i("noboundary", "Body");
            String printmy =  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
             Log.d("system",printmy);
         }
