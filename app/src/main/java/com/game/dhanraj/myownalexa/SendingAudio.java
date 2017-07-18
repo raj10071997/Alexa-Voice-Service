@@ -82,7 +82,7 @@ public class SendingAudio extends AppCompatActivity {
 
     //playbackstarted aur playbacknearlyfinished event send nhi kia hai aur na hi playbackfinished lekin dikkat ye hai ki play directive receive bhi nhi kia hai ek baar dekh lena
 
-    //ye mera comment hai
+
     private Button btn;
     private recorderView record;
     private RecorderConstants recorderConstants;
