@@ -997,7 +997,7 @@ public class SendingAudio extends AppCompatActivity {
     };
 
     public void stopListening(){
-      //  PressTheButton=false;
+
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
