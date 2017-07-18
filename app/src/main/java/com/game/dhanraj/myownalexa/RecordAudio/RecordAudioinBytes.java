@@ -170,13 +170,13 @@ public class RecordAudioinBytes extends AudioRecord {
         return 0;
     }
 
-    //don't know the reason
+    
     public boolean isPausing() {
         double pauseScore = getPauseScore();
       //  Log.i("Pause score: " + pauseScore);
         return pauseScore > 7;
     }
-    //don't know the reason
+   
     private double getPauseScore() {
         long t2 = getRms(mRecordedLength, mOneSec);
         if (t2 == 0) {
@@ -186,7 +186,7 @@ public class RecordAudioinBytes extends AudioRecord {
         mAvgEnergy = (2 * mAvgEnergy + t2) / 3;
         return t;
     }
-    //don't know the reason
+    
     private long getRms(int end, int span) {
         int begin = end - span;
         if (begin < 0) {
@@ -204,11 +204,11 @@ public class RecordAudioinBytes extends AudioRecord {
         }
         return sum;
     }
-    //don't know the reason
+    
     private static short getShort(byte argB1, byte argB2) {
         return (short) (argB1 | (argB2 << 8));
     }
-//don't know the reason and what is the data type of it-synchronized????
+
     public synchronized byte[] consumeRecording() {
         byte[] bytes = getCurrentRecording(mConsumedLength);
         mConsumedLength = mRecordedLength;
