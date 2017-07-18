@@ -953,7 +953,6 @@ public class SendingAudio extends AppCompatActivity {
     private RequestBody requestBody = new RequestBody() {
         @Override
         public MediaType contentType() {
-            //because the content type for audio post request is application/octet-stream in documentation
             return MediaType.parse("application/octet-stream");
         }
 
@@ -993,10 +992,6 @@ public class SendingAudio extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            //changed the code here
-
-  //uncomment kia hai change kia hai
-          //  stopListening();
 
         }
     };
