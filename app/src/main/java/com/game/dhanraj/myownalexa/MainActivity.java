@@ -88,6 +88,11 @@ public class MainActivity extends AppCompatActivity {
     private static boolean forDownChannel,refreshToken;
     public static boolean CheckInternetConnection,DownChannelestablished;
 
+    private SharedPreferences preferences;
+    SharedPreferences validation;
+    SharedPreferences.Editor editorValidation;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +134,18 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+       /* preferences = Util.getPrefernces(myContext);
+        if(preferences.contains("PREF_ACCESS_TOKEN"))
+        {
+          //  Log.d("dhanraj","mainactivity");
+            Intent i = new Intent(MainActivity.this,SendingAudio.class);
+            startActivity(i);
+            //check for save token
+            finish();
+        }*/
+
+
 
 
         }

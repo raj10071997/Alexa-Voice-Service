@@ -411,7 +411,7 @@ public class SendingAudio extends AppCompatActivity {
                     try {
                       //  if (getBoundary(response) != null) {
                         if(true){
-                            System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
+                          //  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
                             ByteArrayDataSource ds = new ByteArrayDataSource(response.body().byteStream(), "multipart/form-data");
                             //response.body().bytestream() doesn't closes the stream.
                             //closing it for not leaking resources otherwise it may ultimately cause the application to slow down or crash.

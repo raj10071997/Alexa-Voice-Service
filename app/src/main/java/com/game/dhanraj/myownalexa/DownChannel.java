@@ -227,6 +227,7 @@ public class DownChannel extends Service {
                                                     Intent intet = new Intent(DownChannel.this, AlarmReceiver.class);
                                                     String scheduledTime = payload.getString("scheduledTime");
                                                     String TYPE = payload.getString("type");
+                                                    Log.d("time",scheduledTime);
                                                     // Calendar calendar = javax.xml.bind.DatatypeConverter.parseDateTime(scheduledTime);
                                                     //"yyyy-MM-dd'T'HH:mm:ss.SSSZ",yyyy-MM-dd'T'HH:mm:ss'
 
@@ -243,12 +244,12 @@ public class DownChannel extends Service {
                                                         calendar.setTimeInMillis(time);
                                                         //for setting new alarm
                                                         int request = (int) (time/1000);
-                                                        int hour = calendar.get(Calendar.HOUR)-7;
+                                                        int hour = calendar.get(Calendar.HOUR);
                                                         int minute = calendar.get(Calendar.MINUTE);
                                                         int year = calendar.get(Calendar.YEAR);
                                                         int AMorPM = calendar.get(Calendar.AM_PM);
                                                       //  calendar.set(Calendar.HOUR,calendar.get(Calendar.HOUR)-7);
-                                                        if(hour<=0)
+                                                        /*if(hour<=0)
                                                         {
                                                             hour = 12+hour;
                                                             if(AMorPM==1)
@@ -256,7 +257,7 @@ public class DownChannel extends Service {
                                                             else
                                                                 AMorPM = 1;
                                                         }
-
+*/
                                                      /*   calendar2.set(Calendar.HOUR,hour);
                                                         calendar2.set(Calendar.MINUTE,minute);
                                                         calendar2.set(Calendar.AM_PM,AMorPM);*/
@@ -269,13 +270,15 @@ public class DownChannel extends Service {
                                                         String myTime = String.valueOf(hour)+" : "+min + "  "+ amOrpm;
 
                                                         intet.putExtra("alarm","alarm on");
+                                                        int lastId = db.getLastRowID();
+                                                        Log.d("lastrowID", String.valueOf(lastId));
                                                         db.addAlarm(myTime,TYPE,calendar.getTimeInMillis());
-                                                        int pendingId = (int) (calendar.getTimeInMillis()/10000);
+                                                       // int pendingId = (int) (calendar.getTimeInMillis()/10000);
 
                                                         Log.d("mywholeTime",hour+","+minute+","+year+","+calendar.get(Calendar.AM_PM));
-                                                        pending = PendingIntent.getBroadcast(DownChannel.this,pendingId,intet,PendingIntent.FLAG_ONE_SHOT);
+                                                        pending = PendingIntent.getBroadcast(DownChannel.this,lastId,intet,PendingIntent.FLAG_ONE_SHOT);
                                                         //calendar2 use karna tha lekin calendar use kar raha hu
-                                                        alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pending);
+                                                        alarmManager.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pending);
 
                                                      //   Log.d("dhanrajtime",dhanraj2);
                                                     } catch (ParseException e) {

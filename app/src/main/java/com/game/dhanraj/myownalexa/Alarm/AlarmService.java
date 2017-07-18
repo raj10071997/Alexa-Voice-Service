@@ -60,13 +60,14 @@ public class AlarmService extends Service {
                 mediaPlayer.reset();
             }
 
-            long idtocancelled = db.getTime();
+            int idtocancelled = db.getTime();
+            int lastId = db.getLastRowID();
             Intent i = new Intent(AlarmService.this, AlarmReceiver.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(AlarmService.this,(int)(idtocancelled/10000),i,PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(AlarmService.this,idtocancelled,i,PendingIntent.FLAG_CANCEL_CURRENT);
 
             alarmManager.cancel(pendingIntent);
 
-            db.deleteTime(idtocancelled);
+            db.deleteTimeRow(idtocancelled);
 
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {

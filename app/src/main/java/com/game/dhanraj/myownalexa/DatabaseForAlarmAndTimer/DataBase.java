@@ -119,17 +119,21 @@ public class DataBase extends SQLiteOpenHelper {
         return  id;
     }
 
-    public long getTime() {
+    public int getTime() {
         SQLiteDatabase db = this.getWritableDatabase();
 
 
-        Cursor cursor = db.query("ListofAlarms",new String[]{"TimeInMilli",
+        Cursor cursor = db.query("ListofAlarms",new String[]{"TimeInMilli","_id"
                 },
-                null,null,null,null,null);
+                null,null,null,null,"TimeInMilli ASC");
 
-        long id=0;
+        int id=0;
 
-        if(cursor.moveToFirst())
+        if (cursor != null && cursor.moveToFirst()) {
+            id = cursor.getInt(cursor.getColumnIndex("_id")); //The 0 is the column index, we only have 1 column, so the index is 0
+        }
+
+       /* if(cursor.moveToFirst())
         {
             do{
                 if(id==0)
@@ -138,7 +142,7 @@ public class DataBase extends SQLiteOpenHelper {
                     id=cursor.getLong(cursor.getColumnIndex("TimeInMilli"));
 
             }while(cursor.moveToNext());
-        }
+        }*/
 
         db.close();
 
@@ -147,12 +151,28 @@ public class DataBase extends SQLiteOpenHelper {
         return id;
     }
 
-    public void deleteTime(long idtocancelled) {
+    public void deleteTimeRow(int idtocancelled) {
         SQLiteDatabase db = this.getWritableDatabase();
         //because of the remainder it is not working
 
-        db.delete("ListofAlarms","TimeInMilli" +" = "+idtocancelled,null);
+        db.delete("ListofAlarms","_id" +" = "+idtocancelled,null);
         db.close();
 
     }
+
+    public int getLastRowID()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT ROWID from MYTABLE order by ROWID DESC limit 1";
+        Cursor c = db.query("ListofAlarms",new String[]{"_id"},null,null,null,null,"_id DESC");
+        int lastId=0;
+        if (c != null && c.moveToFirst()) {
+            lastId = c.getInt(0); //The 0 is the column index, we only have 1 column, so the index is 0
+        }
+
+        return lastId;
+    }
+
+
+
 }
