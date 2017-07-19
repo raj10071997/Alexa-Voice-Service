@@ -29,3 +29,5 @@ It is implementation of alexa voice service in android app. The app also include
    ![4](https://user-images.githubusercontent.com/24502136/28382708-b5351d34-6cdc-11e7-8df4-80f3ea95087f.jpg)
    
    You can delete the alarm from the list by long pressing the desired alarm.
+   
+   Note* - Bugs are still being fixed.
