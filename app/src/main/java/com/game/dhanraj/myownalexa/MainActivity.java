@@ -54,12 +54,15 @@ import static com.game.dhanraj.myownalexa.AccessConstant.CodeVerifierandChalleng
 
 //The authorization code changes everytime you open the app for the first time so you have to get the authorization code everytime you login till your access
 public class MainActivity extends AppCompatActivity {
+    
+    
+    //Fill in the Device type ID here or Application type ID
+    private static final String PRODUCT_ID = "";
 
     public TokenHandler tokenHanlder;
     private RequestContext mRequestContext;
     public  static Context mContext;
     public static Context myContext;
-    private static final String PRODUCT_ID = "DhanrajCompanionProduct";
     private static String PRODUCT_DSN;
     private static String CODE_CHALLENGE_METHOD = "S256";
     private String codeVerifier;
