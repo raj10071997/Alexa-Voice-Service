@@ -1,8 +1,8 @@
-## Alexa-Voice-Service
+# Alexa-Voice-Service
 
 It is implementation of alexa voice service in android app. The app also includes the ability to set an alarm or a timer. 
 
-# Compile and run this application
+## Compile and run this application
 
    1. Follow the process for creating a connected device detailed at this Amazon link  https://developer.amazon.com/appsandservice
    /solutions/alexa/alexa-voice-service/getting-started-with-the-alexa-voice-service. Also see this github link for better  
