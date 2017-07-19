@@ -32,7 +32,7 @@ public class RecorderConstants {
 
 
     private int getBufferSize(){
-        //niche ka function min buffer size deta hai jo necesaary hai audio record karne ke liye
+        //the function below gives min buffer size which is necesaary for audio recording
         int minBufferSizeInBytes = AudioRecord.getMinBufferSize(mSampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
         if (minBufferSizeInBytes == AudioRecord.ERROR_BAD_VALUE) {
             throw new IllegalArgumentException("SpeechRecord.getMinBufferSize: parameters not supported by hardware");

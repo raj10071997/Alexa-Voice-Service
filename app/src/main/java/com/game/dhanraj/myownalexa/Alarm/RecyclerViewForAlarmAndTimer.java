@@ -46,8 +46,6 @@ public class RecyclerViewForAlarmAndTimer extends RecyclerView.Adapter<RecyclerV
         holder.myType.setText(nwConstants.getType());
         holder.myImage.setImageResource(nwConstants.getIconsIDs());
         holder.id.setText(String.valueOf(nwConstants.getAlarmKeyId()));
-    //    holder.myImage.setImageResource(nwConstants.get);
-        //look for circle image
 
     }
 

@@ -54,7 +54,7 @@ import static com.game.dhanraj.myownalexa.MainActivity.getOkhttp;
 public class DownChannel extends Service {
 
 
-    //changed it from na to eu
+
     private String DchannelURL = "https://avs-alexa-eu.amazon.com/v20160207/directives";
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
@@ -79,11 +79,9 @@ public class DownChannel extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("gat", "Launched");
-        //ek baar dekh lena poorana code bhi aur naye ko compare karke
-        //ye isliye dala hai ki execute kar paye na ki enqueue
+
         tokenHandler.getAccessToken(TokenHandler.DownChannelCase1);
-               // openDownChannel();
-       // return super.onStartCommand(intent, flags, startId);
+
         return START_STICKY;
     }
 
@@ -101,7 +99,6 @@ public class DownChannel extends Service {
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onMessageEvent(MessageEvent event){
-//        Log.d(TAG,event.message);
         switch (event.event){
             case TokenHandler.DownChannelCase1:
                 openDownChannel(event.message);

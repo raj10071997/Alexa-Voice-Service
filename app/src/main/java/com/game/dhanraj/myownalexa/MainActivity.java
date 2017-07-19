@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//meine getApplicationContext() use karke dekha tha lekin error aa raha tha, abhi activity ka context pass kia hai
         mContext = MainActivity.this;
         myContext = MainActivity.this;
         mRequestContext = RequestContext.create(this);
@@ -118,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
         DownChannelestablished = true;
         dwn = new DownChannel();
         tokenHanlder = new TokenHandler(myContext);
-        //SharedPreferences perf = Util.getPrefernces(mContext);
 
         Loginbtn = (CircleImageView) findViewById(R.id.btn);
         Loginbtn.setOnClickListener(new View.OnClickListener() {
@@ -135,18 +133,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-       /* preferences = Util.getPrefernces(myContext);
-        if(preferences.contains("PREF_ACCESS_TOKEN"))
-        {
-          //  Log.d("dhanraj","mainactivity");
-            Intent i = new Intent(MainActivity.this,SendingAudio.class);
-            startActivity(i);
-            //check for save token
-            finish();
-        }*/
-
-
-
 
         }
 
@@ -154,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-      //  EventBus.getDefault().register(this);
 
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -164,26 +149,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-       /* String token=null;
-        try {
-            token = getAccessToken();
-        }catch(Exception e)
-        {
 
-        }finally {
-            if(token==null)
-                Toast.makeText(MainActivity.this, "Login to get the access token", Toast.LENGTH_SHORT).show();
-        }
-        if(token != null)
-        {
-            if(!isMyServiceRunning(DownChannel.class))
-            {
-                // intiLogi();
-                Log.d("downchannelStarted","dhanraj");
-                Intent stickyIntent = new Intent(MainActivity.this, DownChannel.class);
-                MainActivity.this.startService(stickyIntent);
-            }
-        }*/
 
 
     }
@@ -198,14 +164,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-       // EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void onDestroy()
     {
         super.onDestroy();
-       // Toast.makeText(<Context>, "Stopping service", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(MainActivity.this, DownChannel.class);
         MainActivity.this.stopService(intent);
     }
@@ -232,49 +196,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /*private static void doPostRequest(final RequestBody form,final String checkRefreshToken) {
-
-        OkHttpClient okclient = getOkhttp();
-        Request request = new Request.Builder()
-                .url("https://api.amazon.com/auth/O2/token")
-                .post(form)
-                .build();
-        Response response=null;
-
-
-        okclient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                call.cancel();
-                Log.d("accessToken","failed");
-                doPostRequest(form,checkRefreshToken);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
-               myresponse = response.body().string();
-
-                TokenResponse tokenResponse = new Gson().fromJson(myresponse, TokenResponse.class);
-                saveToken(tokenResponse);
-
-                Intent st = new Intent(myContext,DownChannel.class);
-                myContext.startService(st);
-
-                if(checkRefreshToken!=null)
-                    refreshToken = false;
-
-            }
-        });
-
-        *//*if(DownChannelestablished){
-            Intent st = new Intent(myContext,DownChannel.class);
-            myContext.startService(st);
-
-            DownChannelestablished=false;
-        }*//*
-
-    }*/
 
     public static void saveToken(TokenResponse tokenResponse) {
 
@@ -332,31 +253,9 @@ public class MainActivity extends AppCompatActivity {
                             .add("client_id", clientId)
                             .add("code_verifier", codeVerifier)
                             .build();
-                  //  doPostRequest(formBody,null);
+
                     tokenHanlder.doPostRequest(formBody,TokenHandler.FirstMainActivityDoPostRequest);
-                  //  SaveToken();
 
-                   // stopService(DownChannel.class);
-
-            //checking if there is no response or not
-//            Intent st = new Intent(MainActivity.this,DownChannel.class);
-//            MainActivity.this.stopService(st);
-
-             /*Handler handler = new Handler(Looper.getMainLooper());
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Intent st = new Intent(MainActivity.this,DownChannel.class);
-                    MainActivity.this.startService(st);
-                }
-            }, 5000);*/
-                   /* if(!isMyServiceRunning(DownChannel.class))
-                    {
-
-                        Log.d("downchannelStarted","dhanraj");
-                        Intent stickyIntent = new Intent(MainActivity.this, DownChannel.class);
-                        MainActivity.this.startService(stickyIntent);
-                    }*/
         }
 
         /* There was an error during the attempt to authorize the application. */
@@ -385,44 +284,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /*public static String getAccessToken(Context context) {
-        SharedPreferences preferences = Util.getPrefernces(context);
-        //if we have an access token
-        if (preferences.contains(PREF_ACCESS_TOKEN)) {
-            Log.d("containAccessToken","contains");
-            if (preferences.getLong(PREF_TOKEN_EXPIRES, 0) > System.currentTimeMillis()) {
-                //if it's not expired, return the existing token
-                Log.d("notexpired","contains");
-                return preferences.getString(PREF_ACCESS_TOKEN, null);
-
-            } else {
-                //if it is expired but we have a refresh token, get a new token
-
-                if (preferences.contains(PREF_REFRESH_TOKEN)) {
-                    Log.d("expired","doesnotcontains");
-                    getRefreshToken(context, preferences.getString(PREF_REFRESH_TOKEN, ""));
-                    while(refreshToken);
-                    refreshToken=true;
-                    return preferences.getString(PREF_ACCESS_TOKEN, null);
-                }
-            }
-        }
-
-        return null;
-    }
-
-
-
-
-    private static void getRefreshToken(Context context, String string) {
-        RequestBody formBody = new FormBody.Builder()
-                .add("grant_type", "refresh_token")
-                .add("refresh_token", string)
-                .add("client_id", Util.getPrefernces(context).getString("clientId",""))
-                .build();
-        doPostRequest(formBody,"RefreshToken");
-
-    }*/
 
     public boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);

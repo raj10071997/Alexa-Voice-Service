@@ -39,14 +39,11 @@ public class AlarmService extends Service {
         int fakeId=0;
         db = new DataBase(AlarmService.this);
         alarmManager =  (AlarmManager) getSystemService(ALARM_SERVICE);
-       // this.startId=0;
         String state = null;
         if(intent.getExtras().getString("extra")!=null)
          state = intent.getExtras().getString("extra");
 
 
-
-      //  assert state !=null;
         if(state.equals("alarm on"))
             fakeId=1;
         else
@@ -85,7 +82,6 @@ public class AlarmService extends Service {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             Intent i = new Intent(AlarmService.this, AlarmReceiver.class);
             i.putExtra("alarm","alarm off");
-            //FLAG_UPDATE_CURRENT use kia tha
             int idtocancelled = db.getTime();
             PendingIntent pendingIntent = PendingIntent.getBroadcast(AlarmService.this,idtocancelled,i,PendingIntent.FLAG_CANCEL_CURRENT);
 

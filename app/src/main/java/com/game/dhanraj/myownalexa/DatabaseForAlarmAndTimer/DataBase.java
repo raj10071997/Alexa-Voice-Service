@@ -130,7 +130,7 @@ public class DataBase extends SQLiteOpenHelper {
         int id=0;
 
         if (cursor != null && cursor.moveToFirst()) {
-            id = cursor.getInt(cursor.getColumnIndex("_id")); //The 0 is the column index, we only have 1 column, so the index is 0
+            id = cursor.getInt(cursor.getColumnIndex("_id"));
         }
 
        /* if(cursor.moveToFirst())
@@ -153,7 +153,6 @@ public class DataBase extends SQLiteOpenHelper {
 
     public void deleteTimeRow(int idtocancelled) {
         SQLiteDatabase db = this.getWritableDatabase();
-        //because of the remainder it is not working
 
         db.delete("ListofAlarms","_id" +" = "+idtocancelled,null);
         db.close();
@@ -167,7 +166,7 @@ public class DataBase extends SQLiteOpenHelper {
         Cursor c = db.query("ListofAlarms",new String[]{"_id"},null,null,null,null,"_id DESC");
         int lastId=0;
         if (c != null && c.moveToFirst()) {
-            lastId = c.getInt(0); //The 0 is the column index, we only have 1 column, so the index is 0
+            lastId = c.getInt(0);
         }
 
         return lastId;

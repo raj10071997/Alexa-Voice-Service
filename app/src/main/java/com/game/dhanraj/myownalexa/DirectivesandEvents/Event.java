@@ -11,10 +11,6 @@ public class Event {
 
 
 
-
-
-
-
     public static class Header{
         String namespace;
         String name;

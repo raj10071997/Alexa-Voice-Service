@@ -44,7 +44,6 @@ public class MyAlarm extends AppCompatActivity {
         recyclerViewForAlarmAndTimer = new RecyclerViewForAlarmAndTimer(this);
         recyclerView.setAdapter(recyclerViewForAlarmAndTimer);
 
-       // recyclerView.setHasFixedSize(true);
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(itemDecoration);
 
@@ -130,7 +129,6 @@ public class MyAlarm extends AppCompatActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 MyAlarm.this);
 
-        // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView2);
 
         // set dialog message
@@ -164,12 +162,6 @@ public class MyAlarm extends AppCompatActivity {
         db.deleteTheRow(ID);
         refreshData();
 
-// all these solution don't work we only have to deference and then reference the new adapter as the old one will be garbage collected
-       /* recyclerViewForAlarmAndTimer recyclerViewForAlarmAndTimer.updateAnswers(db.getDetailsOfAlarmAndTime());
-
-     see documentation - says rely on notifyDataSetChanged as a last resort.
-      recyclerViewForAlarmAndTimer.notifyDataSetChanged();
-        recyclerView.invalidate();*/
 
     }
 

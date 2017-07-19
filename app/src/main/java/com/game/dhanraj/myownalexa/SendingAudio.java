@@ -80,9 +80,6 @@ import static com.game.dhanraj.myownalexa.MainActivity.getOkhttp;
 
 public class SendingAudio extends AppCompatActivity {
 
-    //playbackstarted aur playbacknearlyfinished event send nhi kia hai aur na hi playbackfinished lekin dikkat ye hai ki play directive receive bhi nhi kia hai ek baar dekh lena
-
-
     private Button btn;
     private recorderView record;
     private RecorderConstants recorderConstants;
@@ -106,20 +103,7 @@ public class SendingAudio extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.send_audio);
 
-       /* btn = (Button) findViewById(R.id.stopalarm);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intet = new Intent(SendingAudio.this, AlarmReceiver.class);
-                intet.putExtra("alarm","alarm off");
-                pendingIntent = PendingIntent.getBroadcast(SendingAudio.this,0,intet,PendingIntent.FLAG_UPDATE_CURRENT);
-                alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-                alarmManager.cancel(pendingIntent);
-
-                sendBroadcast(intet);
-            }
-        });*/
 
        tokenHandler = new TokenHandler(this);
 
@@ -166,7 +150,7 @@ public class SendingAudio extends AppCompatActivity {
                     return true;
                 }else if(event.getAction() == MotionEvent.ACTION_UP)
                 {
-                   // stateofbtn.setText("Wait");
+
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
@@ -221,7 +205,7 @@ public class SendingAudio extends AppCompatActivity {
                             checkRecordButton = false;
                         }
                     } else {
-                     //   stateofbtn.setText("Wait");
+
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
@@ -274,7 +258,6 @@ public class SendingAudio extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onMessageEvent(MessageEvent event){
-//        Log.d(TAG,event.message);
         switch (event.event){
             case TokenHandler.SendAudioRequest:
                 sendAudioRequest(requestBody,event.message);
@@ -306,15 +289,13 @@ public class SendingAudio extends AppCompatActivity {
     }
 
     private void send() {
-        //while(mediaPlayer.isPlaying());
 
-        //PressTheButton=true;
         recorderConstants = new RecorderConstants(AUDIO_RATE);
         if(recordAudioinBytes==null){
             recordAudioinBytes = new RecordAudioinBytes();
         }
         recordAudioinBytes.start();
-        //sendAudioRequest(requestBody);
+
         tokenHandler.getAccessToken(TokenHandler.SendAudioRequest);
 
     }
@@ -357,10 +338,9 @@ public class SendingAudio extends AppCompatActivity {
         if(accessToken==null)
         {
             Log.d("sendforrefreshtoken","refreshtoken");
-         /* MainActivity main = new MainActivity();
-            main.intiLogi();*/
+
             Toast.makeText(this, "First take authorization token for getting access token", Toast.LENGTH_SHORT).show();
-           // sendAudioRequest(requestBody);
+
 
         }
         else
@@ -406,15 +386,13 @@ public class SendingAudio extends AppCompatActivity {
                     if(response.isSuccessful())
                     {
                         Log.d("speechrecognizer","success");
-                        //  Log.d("body",response.body().string());
+
                     }
                     try {
                       //  if (getBoundary(response) != null) {
                         if(true){
                           //  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
                             ByteArrayDataSource ds = new ByteArrayDataSource(response.body().byteStream(), "multipart/form-data");
-                            //response.body().bytestream() doesn't closes the stream.
-                            //closing it for not leaking resources otherwise it may ultimately cause the application to slow down or crash.
                             response.body().close();
                             MimeMultipart multipart = null;
                             Boolean checkforExpectSpeech = false;
@@ -460,13 +438,11 @@ public class SendingAudio extends AppCompatActivity {
                                                 long timeoutInMilliseconds = payload.getLong("timeoutInMilliseconds");
                                                 Log.d("timeoutmsec", String.valueOf((timeoutInMilliseconds)));
                                                 checkforExpectSpeech = true;
-                                                // send();
 
                                             } else if (name.equals("Speak") && namespace.equals("SpeechSynthesizer")) {
                                                 Log.d("token", "SpeakDirective");
                                                 if (payload.getString("token") != null) {
                                                     token = payload.getString("token");
-                                                    //memory assginments making it slow in the background thread
                                                     tokenfrompayload = token;
                                                 }
                                             } else if (name.equals("SetAlerts") && namespace.equals("Alerts")) {
@@ -501,17 +477,15 @@ public class SendingAudio extends AppCompatActivity {
                                 Log.d("pooriAudioreceivenhihoi","ResponseFailed");
                             }
                         } else {
-                            // Log.d("alarmresponse",response.body().string());
 
                         }
                     }catch (Exception e){
 
                     }finally {
-                        //checkRecordButton=true;
+
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {
-                              //  stateofbtn.setVisibility(View.INVISIBLE);\
                                 stateofbtn.setText("");
                             }
                         });
@@ -612,7 +586,7 @@ public class SendingAudio extends AppCompatActivity {
         if (accessToken == null)
            tokenHandler.getAccessToken(TokenHandler.SendSpeechFinishedEvent);
         else {
-          //  Log.d("speechfinishedrequest","successful");
+
             OkHttpClient okclient = getOkhttp();
 
             MultipartBody.Builder requestBody = new MultipartBody.Builder()
@@ -634,7 +608,7 @@ public class SendingAudio extends AppCompatActivity {
                 public void onFailure(Call call, IOException e) {
                     call.cancel();
                     Log.d("SendSpeechFinishedEvent","failed");
-                 //   SendSpeechFinishedEvent(TOKEN);
+
                 }
 
                 @Override
@@ -644,14 +618,7 @@ public class SendingAudio extends AppCompatActivity {
                         if(response.header("name")!=null)
                         Log.d("headeroffinishedRequest",response.header("name"));
                     }
-                   // Log.d("speechfinishedrequest",response.body().string());
-                    /*String alertTime = response.body().string();
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(SendingAudio.this, alertTime, Toast.LENGTH_SHORT).show();
-                        }
-                    });*/
+
                 }
             });
 
@@ -682,7 +649,7 @@ public class SendingAudio extends AppCompatActivity {
         if (accessToken == null)
             tokenHandler.getAccessToken(TokenHandler.SendSpeechStartedEvent);
         else {
-           // Log.d("speechstartedrequest","successful");
+
             OkHttpClient okclient = getOkhttp();
 
             MultipartBody.Builder requestBody = new MultipartBody.Builder()
@@ -704,7 +671,7 @@ public class SendingAudio extends AppCompatActivity {
                 public void onFailure(Call call, IOException e) {
                     call.cancel();
                     Log.d("SendSpeechStartedEvent","failed");
-                  //  SendSpeechStartedEvent(TOKEN);
+
                 }
 
                 @Override
@@ -727,8 +694,6 @@ public class SendingAudio extends AppCompatActivity {
            /* if(tokenfrompayload!=null)
                 SendSpeechFinishedEvent(tokenfrompayload);*/
 
-
-
         }
     };
 
@@ -748,15 +713,15 @@ public class SendingAudio extends AppCompatActivity {
             FileOutputStream fos = new FileOutputStream(Mytemp);
             fos.write(mp3SoundByteArray);
             fos.close();
-            //MediaPlayer mediaPlayer = new MediaPlayer();
+
             mediaPlayer.reset();
             mediaPlayer.setOnCompletionListener(mCompletion);
             mediaPlayer.setOnPreparedListener(mPreparation);
             mediaPlayer.setDataSource(Mytemp.getPath());
-            //sending speech started event
+
             if(tokenfrompayload!=null)
                 tokenHandler.getAccessToken(TokenHandler.SendSpeechStartedEvent);
-               // SendSpeechStartedEvent(tokenfrompayload);
+
             mediaPlayer.prepare();
 
 
@@ -782,16 +747,16 @@ public class SendingAudio extends AppCompatActivity {
 
 
             mediaPlayer.stop();
-            //sending speechFinish event
+
             if(tokenfrompayload!=null)
                 tokenHandler.getAccessToken(TokenHandler.SendSpeechFinishedEvent);
-                //SendSpeechFinishedEvent(tokenfrompayload);
+
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
                asyncDialog.dismiss();
-                 //   stateofbtn.setVisibility(View.INVISIBLE);
+
                 }
             });
 
@@ -966,7 +931,7 @@ public class SendingAudio extends AppCompatActivity {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        //  stateofbtn.setVisibility(View.VISIBLE);
+
                         stateofbtn.setText("Listening...");
                     }
                 });

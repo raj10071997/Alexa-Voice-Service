@@ -69,14 +69,11 @@ public class TokenHandler {
                 if (preferences.contains(PREF_REFRESH_TOKEN)) {
                     Log.d("expired","doesnotcontains");
                     getRefreshToken(preferences.getString(PREF_REFRESH_TOKEN, ""),event);
-                  //  while(refreshToken);
-                    //refreshToken=true;
-                  //  return preferences.getString(PREF_ACCESS_TOKEN, null);
+
                 }
             }
         }
 
-      //  return null;
     }
 
     private void getRefreshToken(String string,int event) {
@@ -98,8 +95,6 @@ public class TokenHandler {
                 .build();
         Response response=null;
 
-//        MessageEvent messageEvent = new MessageEvent();
-//        messageEvent.setEvent(checkRefreshTokenEvent);
 
 
         okclient.newCall(request).enqueue(new Callback() {
@@ -126,18 +121,11 @@ public class TokenHandler {
                 }else
                     EventBus.getDefault().post(new MessageEvent(checkRefreshTokenEvent,preferences.getString(PREF_ACCESS_TOKEN,null)));
 
-//                if(checkRefreshToken!=null)
-//                    refreshToken = false;
+
 
             }
         });
 
-        /*if(DownChannelestablished){
-            Intent st = new Intent(myContext,DownChannel.class);
-            myContext.startService(st);
-
-            DownChannelestablished=false;
-        }*/
 
     }
 
