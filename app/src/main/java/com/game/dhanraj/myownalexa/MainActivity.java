@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     
     
     //Fill in the Device type ID here or Application type ID
-    private static final String PRODUCT_ID = "";
+    private static final String PRODUCT_ID = "DhanrajCompanionProduct";
 
     public TokenHandler tokenHanlder;
     private RequestContext mRequestContext;

@@ -1,8 +1,14 @@
 package com.game.dhanraj.myownalexa.Alarm;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +22,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.DatabaseForAlarmAndTimer.DataBase;
+import com.game.dhanraj.myownalexa.DownChannel;
 import com.game.dhanraj.myownalexa.R;
 
 /**
@@ -29,6 +36,10 @@ public class MyAlarm extends AppCompatActivity {
     private DataBase db;
     private int idtoDelete;
     private RecyclerViewForAlarmAndTimer.ViewHolder myView;
+    private AlarmManager alarmManager;
+    private DownChannel downChannel;
+    private boolean mBounded;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,6 +47,11 @@ public class MyAlarm extends AppCompatActivity {
         setContentView(R.layout.myalarm);
 
         db = new DataBase(this);
+
+        alarmManager =  (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        downChannel = new DownChannel();
+
 
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -69,6 +85,37 @@ public class MyAlarm extends AppCompatActivity {
         super.onResume();
       refreshData();
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent mIntent = new Intent(this,DownChannel.class);
+        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
+
+    }
+
+    ServiceConnection mConnection = new ServiceConnection() {
+
+        public void onServiceDisconnected(ComponentName name) {
+            mBounded = false;
+            downChannel = null;
+        }
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBounded = true;
+            DownChannel.LocalBinder mLocalBinder = (DownChannel.LocalBinder)service;
+            downChannel = mLocalBinder.getServerInstance();
+        }
+    };
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mBounded) {
+            unbindService(mConnection);
+            mBounded = false;
+        }
     }
 
     public static interface ClickListener{
@@ -160,6 +207,13 @@ public class MyAlarm extends AppCompatActivity {
 
     private void delete(int ID,int position) {
         db.deleteTheRow(ID);
+
+       // downChannel.cancelPendingIntent(ID);
+
+        Intent i = new Intent(MyAlarm.this, AlarmReceiver.class);
+      //  PendingIntent pendingIntent = PendingIntent.getBroadcast(MyAlarm.this,ID,i,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent.getBroadcast(MyAlarm.this,ID,i,PendingIntent.FLAG_CANCEL_CURRENT).cancel();
+        //alarmManager.cancel(pendingIntent);
         refreshData();
 
 
@@ -169,6 +223,8 @@ public class MyAlarm extends AppCompatActivity {
         recyclerViewForAlarmAndTimer = new RecyclerViewForAlarmAndTimer(this);
         recyclerView.swapAdapter(recyclerViewForAlarmAndTimer,false);
     }
+
+
 
 
 }

@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.Alarm.AlarmReceiver;
+import com.game.dhanraj.myownalexa.Alarm.AlarmService;
 import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
 import com.game.dhanraj.myownalexa.DatabaseForAlarmAndTimer.DataBase;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
@@ -69,11 +71,20 @@ public class DownChannel extends Service {
     public TokenHandler tokenHandler;
 
 
+    IBinder mBinder = new LocalBinder();
+
+
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
+    }
+
+    public class LocalBinder extends Binder {
+        public DownChannel getServerInstance() {
+            return DownChannel.this;
+        }
     }
 
     @Override
@@ -267,13 +278,15 @@ public class DownChannel extends Service {
                                                         String myTime = String.valueOf(hour)+" : "+min + "  "+ amOrpm;
 
                                                         intet.putExtra("alarm","alarm on");
+
+
+                                                        db.addAlarm(myTime,TYPE,calendar.getTimeInMillis());
                                                         int lastId = db.getLastRowID();
                                                         Log.d("lastrowID", String.valueOf(lastId));
-                                                        db.addAlarm(myTime,TYPE,calendar.getTimeInMillis());
                                                        // int pendingId = (int) (calendar.getTimeInMillis()/10000);
 
                                                         Log.d("mywholeTime",hour+","+minute+","+year+","+calendar.get(Calendar.AM_PM));
-                                                        pending = PendingIntent.getBroadcast(DownChannel.this,lastId,intet,PendingIntent.FLAG_ONE_SHOT);
+                                                        pending = PendingIntent.getBroadcast(DownChannel.this,lastId,intet,PendingIntent.FLAG_UPDATE_CURRENT);
                                                         //calendar2 use karna tha lekin calendar use kar raha hu
                                                         alarmManager.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pending);
 
@@ -288,6 +301,7 @@ public class DownChannel extends Service {
 
                                         } catch (JSONException e) {
                                             e.printStackTrace();
+
                                         }
                                     }
 
@@ -295,6 +309,8 @@ public class DownChannel extends Service {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                        //code has been changed here
+                        tokenHandler.getAccessToken(TokenHandler.DownChannelCase1);
                     }
 
 
@@ -499,6 +515,17 @@ public class DownChannel extends Service {
         intent.putExtra("message", "stop");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
+
+    public void cancelPendingIntent(int id)
+    {
+        Intent i = new Intent(DownChannel.this, AlarmReceiver.class);
+        i.putExtra("alarm","alarm on");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(DownChannel.this,id,i,PendingIntent.FLAG_CANCEL_CURRENT);
+
+        alarmManager.cancel(pendingIntent);
+
+    }
+
 
 
 }

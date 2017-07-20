@@ -131,6 +131,7 @@ public class DataBase extends SQLiteOpenHelper {
 
         if (cursor != null && cursor.moveToFirst()) {
             id = cursor.getInt(cursor.getColumnIndex("_id"));
+            Log.d("chechIDofalarm",String.valueOf(id));
         }
 
        /* if(cursor.moveToFirst())

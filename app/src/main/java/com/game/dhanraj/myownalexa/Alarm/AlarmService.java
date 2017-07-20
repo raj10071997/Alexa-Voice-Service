@@ -57,7 +57,7 @@ public class AlarmService extends Service {
                 mediaPlayer.reset();
             }
 
-            int idtocancelled = db.getTime();
+            final int idtocancelled = db.getTime();
             int lastId = db.getLastRowID();
             Intent i = new Intent(AlarmService.this, AlarmReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(AlarmService.this,idtocancelled,i,PendingIntent.FLAG_CANCEL_CURRENT);
@@ -70,7 +70,7 @@ public class AlarmService extends Service {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(AlarmService.this, "Alarm has been cancelled !", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AlarmService.this, "Alarm has been cancelled !" +" "+String.valueOf(idtocancelled), Toast.LENGTH_SHORT).show();
                 }
             });
 
