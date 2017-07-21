@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="login-with-amazon-sdk">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/login-with-amazon-sdk.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
