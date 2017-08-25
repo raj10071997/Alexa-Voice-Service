@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.game.dhanraj.myownalexa">
+    package="com.game.dhanraj.myownalexa">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
-    
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
         android:allowBackup="true"
@@ -17,18 +16,22 @@
         android:theme="@style/AppTheme">
         <service
             android:name=".DownChannel"
-            android:enabled="true"/>
-        <service android:name=".Alarm.AlarmService"
-                 android:enabled="true"/>
+            android:enabled="true" />
+        <service
+            android:name=".Alarm.AlarmService"
+            android:enabled="true" />
 
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-              <!--  <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.BATTERY_LOW"/>-->
-                <action android:name="android.intent.action.PACKAGE_FIRST_LAUNCH"/>
+
+                <!--
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BATTERY_LOW"/>
+                -->
+                <action android:name="android.intent.action.PACKAGE_FIRST_LAUNCH" />
                 <!--
                 <action android:name="android.intent.action.REBOOT"/>
                 <action android:name="android.intent.action.SCREEN_ON"/>
@@ -37,48 +40,53 @@
                 -->
             </intent-filter>
         </receiver>
-        <receiver android:name=".Alarm.AlarmReceiver"></receiver>
+        <receiver android:name=".Alarm.AlarmReceiver" />
 
         <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+
         </activity>
         <activity android:name=".LoginWebViewActivity">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- host should be our application package // -->
                 <data
                     android:host="www.amazon.com"
                     android:pathPattern="/ap/oa"
-                    android:scheme="https"/>
+                    android:scheme="https" />
             </intent-filter>
         </activity>
-        <activity android:name=".Alarm.MyAlarm"/>
+        <activity android:name=".Alarm.MyAlarm" />
         <activity
             android:name="com.amazon.identity.auth.device.workflow.WorkflowActivity"
             android:allowTaskReparenting="true"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- host should be our application package // -->
                 <data
                     android:host="com.game.dhanraj.myownalexa"
-                    android:scheme="amzn"/>
+                    android:scheme="amzn" />
             </intent-filter>
         </activity>
-        <activity android:name=".SendingAudio"/>
+        <activity android:name=".SendingAudio" />
+        <activity android:name=".SplashActivitiy">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

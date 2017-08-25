@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     private static boolean forDownChannel,refreshToken;
     public static boolean CheckInternetConnection,DownChannelestablished;
 
-    private SharedPreferences preferences;
+    //private SharedPreferences preferences;
     SharedPreferences validation;
     SharedPreferences.Editor editorValidation;
 
@@ -100,8 +100,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mContext = MainActivity.this;
         myContext = MainActivity.this;
+
+
+
         mRequestContext = RequestContext.create(this);
         mRequestContext.registerListener(new AuthorizeListenerImpl());
 
@@ -149,6 +153,16 @@ public class MainActivity extends AppCompatActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected())) {
             Toast.makeText(MainActivity.this, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
+        }else
+        {
+            SharedPreferences preferences= Util.getPrefernces(myContext);
+
+            if (preferences.contains(PREF_REFRESH_TOKEN)) {
+                Intent st = new Intent(myContext,DownChannel.class);
+                startService(st);
+
+
+            }
         }
 
 
