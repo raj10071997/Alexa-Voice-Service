@@ -82,6 +82,7 @@ public class SendingAudio extends AppCompatActivity {
 
     private Button btn;
     private recorderView record;
+   // private newMicroPhoneView mymicro;
     private RecorderConstants recorderConstants;
     public  RecordAudioinBytes recordAudioinBytes;
     private static final int AUDIO_RATE = 16000;
@@ -114,6 +115,10 @@ public class SendingAudio extends AppCompatActivity {
 
         mediaPlayer = new MediaPlayer();
         record = (recorderView) findViewById(R.id.sendAudiobtn);
+
+        //mymicro = (newMicroPhoneView) findViewById(R.id.);
+
+
 
         record.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -186,6 +191,14 @@ public class SendingAudio extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        Intent intent = new Intent(SendingAudio.this, DownChannel.class);
+        SendingAudio.this.stopService(intent);
     }
 
 

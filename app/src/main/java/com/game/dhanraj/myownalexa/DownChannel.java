@@ -103,7 +103,9 @@ public class DownChannel extends Service {
         calendar = Calendar.getInstance();
         sendingAudio  = new SendingAudio();
         calendar2 = Calendar.getInstance();
+
         EventBus.getDefault().register(this);
+
         tokenHandler = new TokenHandler(this);
         db = new DataBase(DownChannel.this);
     }
@@ -127,6 +129,7 @@ public class DownChannel extends Service {
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+
     }
 
 
@@ -317,9 +320,9 @@ public class DownChannel extends Service {
                 }
             });
 
-            Intent dialogIntent = new Intent(DownChannel.this, SendingAudio.class);
-            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(dialogIntent);
+
+
+
         }
 
     }
@@ -462,6 +465,12 @@ public class DownChannel extends Service {
                 public void onResponse(Call call, final Response response) throws IOException {
 
                     tokenHandler.getAccessToken(TokenHandler.DownChannelCase3);
+
+                    Intent dialogIntent = new Intent(DownChannel.this, SendingAudio.class);
+                    dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(dialogIntent);
+
+                    EventBus.getDefault().post(new MessageEvent(109,"finishSplashActivity"));
                 }
         });
 

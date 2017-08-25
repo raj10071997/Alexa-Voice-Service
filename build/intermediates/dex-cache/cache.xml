@@ -30,6 +30,15 @@
     </item>
     <item
         is-multidex="true"
+        jar="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/exploded-aar/com.android.support.constraint/constraint-layout/1.0.2/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="44ee06abb66da30f5855e6bf54574e64cdcd982a">
+        <dex dex="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support.constraint-constraint-layout-1.0.2_cedeb7ac4c7117ac84c70b38beb7a8eb2a3bfaa6/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.3.1/jars/classes.jar"
         jumboMode="false"
         optimize="true"
@@ -72,6 +81,15 @@
         revision="25.0.0"
         sha1="81461752739c084ddfa51733704358748a257c85">
         <dex dex="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/transforms/dex/debug/folders/1000/2/login-with-amazon-sdk_6900ecd2e67ba05371e076940633032658438989/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/dhanraj/Android/Sdk/extras/m2repository/com/android/support/constraint/constraint-layout-solver/1.0.2/constraint-layout-solver-1.0.2.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="b9cd8fc6bd15cb915735d34535db30ece0c44603">
+        <dex dex="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/transforms/dex/debug/folders/1000/10/constraint-layout-solver-1.0.2_fc856519dd599842ce6965b6c19e42fcfb7fbfe0/classes.dex" />
     </item>
     <item
         is-multidex="true"
