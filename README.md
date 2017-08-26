@@ -30,4 +30,4 @@ It is implementation of alexa voice service in android app. The app also include
    
    You can delete the alarm from the list by long pressing the desired alarm.
    
-   Note* - Bugs are still being fixed.
+ 
