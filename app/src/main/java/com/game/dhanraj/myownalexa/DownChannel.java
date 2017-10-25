@@ -155,6 +155,7 @@ public class DownChannel extends Service {
         if(accessToken==null)
         {
             Log.d("openDownChannel","failed");
+
             Intent i = new Intent(DownChannel.this,MainActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
@@ -166,6 +167,7 @@ public class DownChannel extends Service {
                 }
             });
             openDownChannel(accessToken);
+
 
             MainActivity main = new MainActivity();
             main.intiLogi();*/
