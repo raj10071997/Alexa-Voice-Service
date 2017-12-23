@@ -24,8 +24,6 @@ import static com.game.dhanraj.myownalexa.MainActivity.PREF_ACCESS_TOKEN;
 import static com.game.dhanraj.myownalexa.MainActivity.PREF_REFRESH_TOKEN;
 import static com.game.dhanraj.myownalexa.MainActivity.PREF_TOKEN_EXPIRES;
 import static com.game.dhanraj.myownalexa.MainActivity.getOkhttp;
-import static com.game.dhanraj.myownalexa.MainActivity.myContext;
-import static com.game.dhanraj.myownalexa.MainActivity.saveToken;
 
 /**
  * Created by dhanraj on 16/7/17.
@@ -37,6 +35,8 @@ public class TokenHandler {
 
     public Context myContext;
     public String myresponse;
+    private String REFRESH_TOKEN;
+    private String ACCESS_TOKEN;
     public static final int FirstMainActivityDoPostRequest = 101;
     public static final int DownChannelCase1 = 102;
     public static final int DownChannelCase2 = 103;
@@ -127,6 +127,19 @@ public class TokenHandler {
         });
 
 
+    }
+
+
+    public  void saveToken(MainActivity.TokenResponse tokenResponse) {
+
+        REFRESH_TOKEN = tokenResponse.refresh_token;
+        ACCESS_TOKEN = tokenResponse.access_token;
+        SharedPreferences.Editor preferences = Util.getPrefernces(myContext).edit();
+        preferences.putString(PREF_ACCESS_TOKEN, ACCESS_TOKEN);
+        preferences.putString(PREF_REFRESH_TOKEN, REFRESH_TOKEN);
+        //comes back in seconds, needs to be milis
+        preferences.putLong(PREF_TOKEN_EXPIRES, (System.currentTimeMillis() + tokenResponse.expires_in * 1000));
+        preferences.apply();
     }
 
 }

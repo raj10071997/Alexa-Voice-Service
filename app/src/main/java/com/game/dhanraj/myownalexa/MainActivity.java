@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
     public TokenHandler tokenHanlder;
     private RequestContext mRequestContext;
-    public  static Context mContext;
     public static Context myContext;
     private static String PRODUCT_DSN;
     private static String CODE_CHALLENGE_METHOD = "S256";
@@ -72,11 +71,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView txt;
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
-    private Button btn, pst,nxtaudio;
-    private CircleImageView Loginbtn;
 
-    private static String REFRESH_TOKEN;
-    private static String ACCESS_TOKEN;
+    private CircleImageView Loginbtn;
 
     private static String myresponse;
     public static String CLIENTID;
@@ -101,10 +97,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mContext = MainActivity.this;
         myContext = MainActivity.this;
-
-
 
         mRequestContext = RequestContext.create(this);
         mRequestContext.registerListener(new AuthorizeListenerImpl());
@@ -160,15 +153,8 @@ public class MainActivity extends AppCompatActivity {
             if (preferences.contains(PREF_REFRESH_TOKEN)) {
                 Intent st = new Intent(myContext,DownChannel.class);
                 startService(st);
-
-
             }
         }
-
-
-
-
-
     }
 
 
@@ -212,21 +198,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-    public static void saveToken(TokenResponse tokenResponse) {
-
-        REFRESH_TOKEN = tokenResponse.refresh_token;
-        ACCESS_TOKEN = tokenResponse.access_token;
-        SharedPreferences.Editor preferences = Util.getPrefernces(mContext).edit();
-        preferences.putString(PREF_ACCESS_TOKEN, ACCESS_TOKEN);
-        preferences.putString(PREF_REFRESH_TOKEN, REFRESH_TOKEN);
-        //comes back in seconds, needs to be milis
-        preferences.putLong(PREF_TOKEN_EXPIRES, (System.currentTimeMillis() + tokenResponse.expires_in * 1000));
-        preferences.apply();
-    }
-
-
     public void intiLogi() {
 
         final JSONObject scopeData = new JSONObject();
@@ -242,8 +213,6 @@ public class MainActivity extends AppCompatActivity {
                     .forGrantType(AuthorizeRequest.GrantType.AUTHORIZATION_CODE)
                     .withProofKeyParameters(codeChallenge, CODE_CHALLENGE_METHOD)
                     .build());
-
-
         } catch (JSONException e) {
             // handle exception here
         }
@@ -260,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
             final String clientId = authorizeResult.getClientId();
             CLIENTID = clientId;
 
-                    SharedPreferences.Editor  preferences = Util.getPrefernces(mContext).edit();
+                    SharedPreferences.Editor  preferences = Util.getPrefernces(myContext).edit();
                     preferences.putString("clientID",clientId);
                     preferences.apply();
                     RequestBody formBody = new FormBody.Builder()
@@ -288,15 +257,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
+    //TODO: move to Util.java
     public static OkHttpClient getOkhttp() {
         if (client == null)
             client = new OkHttpClient();
-
-
         return client;
     }
 
