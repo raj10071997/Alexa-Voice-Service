@@ -19,11 +19,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
+import com.game.dhanraj.myownalexa.NavigationDrawer.NavigationFragment;
 import com.game.dhanraj.myownalexa.RecordAudio.RecordAudioinBytes;
 import com.game.dhanraj.myownalexa.RecordAudio.RecorderConstants;
 import com.game.dhanraj.myownalexa.RecorderView.recorderView;
@@ -71,8 +75,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
 
-import static com.game.dhanraj.myownalexa.MainActivity.getOkhttp;
-
+import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
 
 /**
  * Created by Dhanraj on 05-06-2017.
@@ -97,14 +100,15 @@ public class SendingAudio extends AppCompatActivity {
     private TextView stateofbtn;
     private AlarmManager alarmManager;
     public TokenHandler tokenHandler;
-
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.send_audio);
+        setContentView(R.layout.send_audio_drawer);
 
-
+        toolbar = (Toolbar) findViewById(R.id.toolbar4);
+        setSupportActionBar(toolbar);
 
        tokenHandler = new TokenHandler(this);
 
@@ -118,7 +122,12 @@ public class SendingAudio extends AppCompatActivity {
 
         //mymicro = (newMicroPhoneView) findViewById(R.id.);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
+        NavigationFragment navigationFragment = (NavigationFragment)
+                getSupportFragmentManager().findFragmentById(R.id.navigation_fragment2);
+        navigationFragment.setUp(R.id.navigation_fragment2,(DrawerLayout)findViewById(R.id.drawer_layout2),toolbar);
 
         record.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -145,12 +154,12 @@ public class SendingAudio extends AppCompatActivity {
                                     Toast.makeText(SendingAudio.this, "Speak", Toast.LENGTH_SHORT).show();
                                     checkRecordButton = false;
                                 }
-
-
-
                             }
                         } else
-                            Toast.makeText(SendingAudio.this, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
+                        {
+                            Snackbar.make(v, "No Internet Connectivity", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        }
                     }
                     return true;
                 }else if(event.getAction() == MotionEvent.ACTION_UP)
@@ -168,7 +177,8 @@ public class SendingAudio extends AppCompatActivity {
                 return false;
             }
         });
-        
+        EventBus.getDefault().post(new MessageEvent(TokenHandler.SplashActivity,"finishSplashActivity"));
+        EventBus.getDefault().post(new MessageEvent(TokenHandler.FinishMainActivity,""));
 
     }
 
@@ -184,8 +194,8 @@ public class SendingAudio extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent i = new Intent(SendingAudio.this, MyAlarm.class);
-                startActivity(i);
+                /*Intent i = new Intent(SendingAudio.this, MyAlarm.class);
+                startActivity(i);*/
                 return true;
 
             default:

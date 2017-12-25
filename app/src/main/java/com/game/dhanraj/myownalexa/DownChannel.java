@@ -47,7 +47,8 @@ import okhttp3.Response;
 import okio.Buffer;
 import okio.BufferedSource;
 
-import static com.game.dhanraj.myownalexa.MainActivity.getOkhttp;
+import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
+
 
 /**
  * Created by Dhanraj on 01-06-2017.
@@ -135,8 +136,6 @@ public class DownChannel extends Service {
 
     public void openDownChannel(final String accessToken) {
 
-
-
         OkHttpClient client2 = getOkhttp();
 
         OkHttpClient client=  client2.newBuilder()
@@ -156,9 +155,18 @@ public class DownChannel extends Service {
         {
             Log.d("openDownChannel","failed");
 
-            Intent i = new Intent(DownChannel.this,MainActivity.class);
+           /* Intent i = new Intent(DownChannel.this,MainActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
+            startActivity(i);*/
+
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(DownChannel.this, "You Login has been failed because accessToken string is null",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
            /*openDownChannel();
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
@@ -179,7 +187,6 @@ public class DownChannel extends Service {
                     .get()
                     .addHeader("authorization","Bearer "+accessToken)
                     .build();
-
 
             client.newCall(request).enqueue(new Callback() {
                 @Override
@@ -210,19 +217,14 @@ public class DownChannel extends Service {
 
                   //  StringBuilder stringBuilder = new StringBuilder();
 
-
                     BufferedSource bufferedSource = response.body().source();
-                    Buffer buffer = new Buffer();
-
+                   // Buffer buffer = new Buffer();
                     try {
-
                         while (!bufferedSource.exhausted()) {
-                        // String line = bufferedSource.readUtf8Line();
+                        String line = bufferedSource.readUtf8Line();
                        // bufferedSource.read(buffer, 8192);
-                            String line = bufferedSource.readUtf8Line();
                          //   stringBuilder.append(line);
                              boolean checkJson = isJSONValid(line);
-
                                     if(checkJson==true)
                                     {
                                         try {
@@ -306,7 +308,6 @@ public class DownChannel extends Service {
 
                                                 }
                                             }
-
                                         } catch (JSONException e) {
                                             e.printStackTrace();
 
@@ -320,16 +321,9 @@ public class DownChannel extends Service {
                         //code has been changed here
                         tokenHandler.getAccessToken(TokenHandler.DownChannelCase1);
                     }
-
-
                 }
             });
-
-
-
-
         }
-
     }
 
     public boolean isJSONValid(String test) {
@@ -475,7 +469,7 @@ public class DownChannel extends Service {
                     dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(dialogIntent);
 
-                    EventBus.getDefault().post(new MessageEvent(109,"finishSplashActivity"));
+                 //   EventBus.getDefault().post(new MessageEvent(TokenHandler.SplashActivity,"finishSplashActivity"));
                 }
         });
 

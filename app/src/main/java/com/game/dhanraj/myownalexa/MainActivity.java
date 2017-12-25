@@ -9,7 +9,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,10 +33,13 @@ import com.amazon.identity.auth.device.api.authorization.ScopeFactory;
 import com.amazon.identity.auth.device.api.workflow.RequestContext;
 import com.game.dhanraj.myownalexa.AccessConstant.CodeVerifierandChallengeMethods;
 import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
+import com.game.dhanraj.myownalexa.NavigationDrawer.NavigationFragment;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -67,12 +74,13 @@ public class MainActivity extends AppCompatActivity {
     private String codeVerifier;
     private static String authCode, redirectURI, clientID;
     private static String codeChallenge;
-    private static OkHttpClient client;
+
     private TextView txt;
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
 
     private CircleImageView Loginbtn;
+    private Toolbar toolbar;
 
     private static String myresponse;
     public static String CLIENTID;
@@ -95,7 +103,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_app_bar);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         myContext = MainActivity.this;
 
@@ -128,12 +139,19 @@ public class MainActivity extends AppCompatActivity {
                 if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
                 intiLogi();
                 else
-                    Toast.makeText(MainActivity.this, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
-
+                {
+                    Snackbar.make(v, "No Internet Connectivity", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
             }
         });
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
+        NavigationFragment navigationFragment = (NavigationFragment)
+                getSupportFragmentManager().findFragmentById(R.id.navigation_fragment);
+            navigationFragment.setUp(R.id.navigation_fragment,(DrawerLayout)findViewById(R.id.drawer_layout),toolbar);
         }
 
 
@@ -141,11 +159,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        ConnectivityManager connectivityManager
+        EventBus.getDefault().register(this);
+
+        /*ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected())) {
-            Toast.makeText(MainActivity.this, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
+
         }else
         {
             SharedPreferences preferences= Util.getPrefernces(myContext);
@@ -154,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent st = new Intent(myContext,DownChannel.class);
                 startService(st);
             }
-        }
+        }*/
     }
 
 
@@ -167,14 +187,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onMessageEvent(MessageEvent event){
+        switch (event.event){
+            case TokenHandler.FinishMainActivity:
+                finish();
+               break;
+        }
     }
 
     @Override
     public void onDestroy()
     {
         super.onDestroy();
-        Intent intent = new Intent(MainActivity.this, DownChannel.class);
-        MainActivity.this.stopService(intent);
+       /* Intent intent = new Intent(MainActivity.this, DownChannel.class);
+        MainActivity.this.stopService(intent);*/
     }
 
     @Override
@@ -184,13 +214,25 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
+    @Override
+    public void onBackPressed() {
+         DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent i = new Intent(MainActivity.this, MyAlarm.class);
-                startActivity(i);
+               /* Intent i = new Intent(MainActivity.this, MyAlarm.class);
+                startActivity(i);*/
                 return true;
 
             default:
@@ -257,15 +299,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //TODO: move to Util.java
-    public static OkHttpClient getOkhttp() {
-        if (client == null)
-            client = new OkHttpClient();
-        return client;
-    }
-
-
-
     public boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -276,11 +309,5 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    //for JSON parsing of our token responses
-    public static class TokenResponse{
-        public String access_token;
-        public String refresh_token;
-        public String token_type;
-        public long expires_in;
-    }
+
 }

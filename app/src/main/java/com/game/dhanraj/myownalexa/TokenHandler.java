@@ -3,7 +3,10 @@ package com.game.dhanraj.myownalexa;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 import com.google.gson.Gson;
@@ -23,7 +26,7 @@ import okhttp3.Response;
 import static com.game.dhanraj.myownalexa.MainActivity.PREF_ACCESS_TOKEN;
 import static com.game.dhanraj.myownalexa.MainActivity.PREF_REFRESH_TOKEN;
 import static com.game.dhanraj.myownalexa.MainActivity.PREF_TOKEN_EXPIRES;
-import static com.game.dhanraj.myownalexa.MainActivity.getOkhttp;
+import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
 
 /**
  * Created by dhanraj on 16/7/17.
@@ -45,6 +48,8 @@ public class TokenHandler {
     public static final int SendSpeechFinishedEvent=106;
     public static final int SendSpeechStartedEvent=107;
     public static final int SendPlaybackStartedEvent = 108;
+    public static final int SplashActivity = 109;
+    public static final int FinishMainActivity = 110;
 
 
     public TokenHandler(Context context) {
@@ -111,7 +116,7 @@ public class TokenHandler {
                 myresponse = response.body().string();
 
 
-                MainActivity.TokenResponse tokenResponse = new Gson().fromJson(myresponse, MainActivity.TokenResponse.class);
+                TokenResponse tokenResponse = new Gson().fromJson(myresponse, TokenResponse.class);
                 saveToken(tokenResponse);
 
                 if(checkRefreshTokenEvent==FirstMainActivityDoPostRequest)
@@ -121,16 +126,12 @@ public class TokenHandler {
                 }else
                     EventBus.getDefault().post(new MessageEvent(checkRefreshTokenEvent,preferences.getString(PREF_ACCESS_TOKEN,null)));
 
-
-
             }
         });
-
-
     }
 
 
-    public  void saveToken(MainActivity.TokenResponse tokenResponse) {
+    public void saveToken(final TokenResponse tokenResponse) {
 
         REFRESH_TOKEN = tokenResponse.refresh_token;
         ACCESS_TOKEN = tokenResponse.access_token;
@@ -139,7 +140,23 @@ public class TokenHandler {
         preferences.putString(PREF_REFRESH_TOKEN, REFRESH_TOKEN);
         //comes back in seconds, needs to be milis
         preferences.putLong(PREF_TOKEN_EXPIRES, (System.currentTimeMillis() + tokenResponse.expires_in * 1000));
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(myContext, String.valueOf(tokenResponse.expires_in) , Toast.LENGTH_SHORT).show();
+            }
+        });
+
         preferences.apply();
+    }
+
+    //for JSON parsing of our token responses
+    public class TokenResponse{
+        public String access_token;
+        public String refresh_token;
+        public String token_type;
+        public long expires_in;
     }
 
 }
