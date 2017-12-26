@@ -166,6 +166,7 @@ public class DownChannel extends Service {
                             Toast.LENGTH_SHORT).show();
                 }
             });
+            tokenHandler.getAccessToken(TokenHandler.DownChannelCase1);
 
            /*openDownChannel();
             new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -213,10 +214,7 @@ public class DownChannel extends Service {
                             Toast.makeText(DownChannel.this, "DownChannel has been established", Toast.LENGTH_SHORT).show();
                         }
                     });
-
-
                   //  StringBuilder stringBuilder = new StringBuilder();
-
                     BufferedSource bufferedSource = response.body().source();
                    // Buffer buffer = new Buffer();
                     try {
@@ -249,7 +247,7 @@ public class DownChannel extends Service {
                                                     // Calendar calendar = javax.xml.bind.DatatypeConverter.parseDateTime(scheduledTime);
                                                     //"yyyy-MM-dd'T'HH:mm:ss.SSSZ",yyyy-MM-dd'T'HH:mm:ss'
 
-                                                    DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+                                                    DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
                                                   //  DateFormat fmt2 = new SimpleDateFormat("HH:mm:ss", Locale.US);
 
                                                     //  DateFormat fmt = DateFormat.getTimeInstance(DateFormat.LONG, Locale.US);
@@ -305,6 +303,9 @@ public class DownChannel extends Service {
                                                         e.printStackTrace();
                                                         Log.d("ParsingException","DownnChannelException");
                                                     }
+
+                                                }else if(type.equals("TIMER"))
+                                                {
 
                                                 }
                                             }

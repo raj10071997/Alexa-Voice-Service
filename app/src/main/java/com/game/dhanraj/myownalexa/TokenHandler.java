@@ -141,12 +141,12 @@ public class TokenHandler {
         //comes back in seconds, needs to be milis
         preferences.putLong(PREF_TOKEN_EXPIRES, (System.currentTimeMillis() + tokenResponse.expires_in * 1000));
 
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+       /* new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 Toast.makeText(myContext, String.valueOf(tokenResponse.expires_in) , Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
 
         preferences.apply();
     }
