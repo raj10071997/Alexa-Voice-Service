@@ -165,6 +165,15 @@
     </item>
     <item
         is-multidex="true"
+        jar="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/25.3.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="914f5d3e3ace66080e59613708f06d129a222e25">
+        <dex dex="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-cardview-v7-25.3.1_a2918f95025f8b2c4c113ddebbe89f8229f32e6f/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.3.1/jars/classes.jar"
         jumboMode="false"
         optimize="true"
@@ -237,21 +246,21 @@
     </item>
     <item
         is-multidex="true"
-        jar="/home/dhanraj/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.7/751f548c85fa49f330cecbb1875893f971b33c4e/gson-2.7.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="751f548c85fa49f330cecbb1875893f971b33c4e">
-        <dex dex="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/transforms/dex/debug/folders/1000/10/gson-2.7_03ec8afca93e7d4b8bf1364659847249639d70b6/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.3.1/jars/classes.jar"
         jumboMode="false"
         optimize="true"
         revision="25.0.0"
         sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
         <dex dex="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-utils-25.3.1_f2886b0fddd544e62c719aedffb5ec050d41f59b/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/dhanraj/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.7/751f548c85fa49f330cecbb1875893f971b33c4e/gson-2.7.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="751f548c85fa49f330cecbb1875893f971b33c4e">
+        <dex dex="/home/dhanraj/AndroidStudioProjects/MyOwnAlexa/app/build/intermediates/transforms/dex/debug/folders/1000/10/gson-2.7_03ec8afca93e7d4b8bf1364659847249639d70b6/classes.dex" />
     </item>
 
 </items>

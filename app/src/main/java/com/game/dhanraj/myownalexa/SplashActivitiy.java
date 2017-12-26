@@ -76,7 +76,7 @@ public class SplashActivitiy extends AppCompatActivity {
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onMessageEvent(MessageEvent event){
         switch (event.event){
-            case 109:
+            case TokenHandler.SplashActivity:
                     if(event.message.equals("finishSplashActivity"))
                     {
                         Log.d("checkthismethod","splashscreen");

@@ -7,6 +7,8 @@ import android.text.TextUtils;
 
 import java.util.UUID;
 
+import okhttp3.OkHttpClient;
+
 /**
  * Created by Dhanraj on 30-05-2017.
  */
@@ -15,6 +17,7 @@ public class Util {
 
     public static SharedPreferences mPreferences;
     public static final String IDENTIFIER = "identifier";
+    public static OkHttpClient client;
 
     public static SharedPreferences getPrefernces(Context context){
         if(mPreferences==null)
@@ -34,6 +37,12 @@ public class Util {
     public static String getUuid(){
         String prefix=(TextUtils.isEmpty(getIdentifier()))?"":getIdentifier()+".";
         return prefix + UUID.randomUUID().toString();
+    }
+
+    public static OkHttpClient getOkhttp() {
+        if (client == null)
+            client = new OkHttpClient();
+        return client;
     }
 
 

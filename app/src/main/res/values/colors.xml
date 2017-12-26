@@ -3,4 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="md_grey_500">#9E9E9E</color>
+    <color name="md_grey_100">#F5F5F5</color>
+    <color name="md_dark_primary_text">#000000</color>
+    <color name="md_grey_400">#BDBDBD</color>
+    <color name="md_dark_background">#303030</color>
 </resources>

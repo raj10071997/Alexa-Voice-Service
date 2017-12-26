@@ -10,13 +10,16 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -39,6 +42,7 @@ public class MyAlarm extends AppCompatActivity {
     private AlarmManager alarmManager;
     private DownChannel downChannel;
     private boolean mBounded;
+    private Toolbar toolbar;
 
 
     @Override
@@ -52,6 +56,12 @@ public class MyAlarm extends AppCompatActivity {
 
         downChannel = new DownChannel();
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar3);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Alarms and Timers");
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -74,8 +84,8 @@ public class MyAlarm extends AppCompatActivity {
             @Override
             public void onLongClick(View view, int position) {
             AlarmConstants myconst = recyclerViewForAlarmAndTimer.getItem(position);
-                prompts(myconst.getAlarmKeyId(),position);
-               Toast.makeText(MyAlarm.this,String.valueOf(myconst.getAlarmKeyId())+" "+myconst.getMytime(), Toast.LENGTH_SHORT).show();
+                prompts(myconst.getAlarmKeyId(),position,view);
+             //  Toast.makeText(MyAlarm.this,String.valueOf(myconst.getAlarmKeyId())+" "+myconst.getMytime(), Toast.LENGTH_SHORT).show();
             }
         }));
     }
@@ -116,6 +126,16 @@ public class MyAlarm extends AppCompatActivity {
             unbindService(mConnection);
             mBounded = false;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public static interface ClickListener{
@@ -168,7 +188,7 @@ public class MyAlarm extends AppCompatActivity {
         }
     }
 
-    public void prompts(final int ID,final int position)
+    public void prompts(final int ID, final int position, final View view)
     {
         LayoutInflater li = LayoutInflater.from(MyAlarm.this);
         View promptsView2 = li.inflate(R.layout.prompts,null);
@@ -186,7 +206,7 @@ public class MyAlarm extends AppCompatActivity {
                             public void onClick(DialogInterface dialog,int id) {
                                 // get user input and set it to result
                                 // edit text
-                                delete(ID,position);
+                                delete(ID,position,view);
 
                             }
                         })
@@ -205,7 +225,7 @@ public class MyAlarm extends AppCompatActivity {
     }
 
 
-    private void delete(int ID,int position) {
+    private void delete(int ID,int position, View view) {
         db.deleteTheRow(ID);
 
        // downChannel.cancelPendingIntent(ID);
@@ -214,6 +234,8 @@ public class MyAlarm extends AppCompatActivity {
       //  PendingIntent pendingIntent = PendingIntent.getBroadcast(MyAlarm.this,ID,i,PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent.getBroadcast(MyAlarm.this,ID,i,PendingIntent.FLAG_CANCEL_CURRENT).cancel();
         //alarmManager.cancel(pendingIntent);
+        Snackbar.make(view, "No Internet Connectivity", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
         refreshData();
 
 

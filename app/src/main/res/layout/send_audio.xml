@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#8e24aa"
+                android:background="@color/cardview_dark_background"
                 android:orientation="vertical">
 
     <TextView
@@ -13,11 +13,10 @@
         android:textStyle="bold|italic"
         android:textAlignment="center"
         android:layout_marginTop="15dp"
+        android:textColor="@color/cardview_light_background"
         android:textSize="20dp"
         />
     <!--    android:visibility="invisible"-->
-
-
 
     <com.game.dhanraj.myownalexa.RecorderView.recorderView
         android:id="@+id/sendAudiobtn"

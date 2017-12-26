@@ -6,4 +6,12 @@
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="nav_drawer_width">280dp</dimen>
+    <dimen name="card_spacing">10dp</dimen>
+    <dimen name="card_corner_radius">10dp</dimen>
+    <dimen name="card_elevation">5dp</dimen>
+    <dimen name="big_text">25dp</dimen>
+    <dimen name="sub_small_spacing">5dp</dimen>
+    <dimen name="medium_text">16dp</dimen>
+    <dimen name="sub_medium_text">14dp</dimen>
 </resources>
