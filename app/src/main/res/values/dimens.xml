@@ -14,4 +14,6 @@
     <dimen name="sub_small_spacing">5dp</dimen>
     <dimen name="medium_text">16dp</dimen>
     <dimen name="sub_medium_text">14dp</dimen>
+    <dimen name="circular_icon_width_row">50dp</dimen>
+    <dimen name="circular_icon_height_row">50dp</dimen>
 </resources>

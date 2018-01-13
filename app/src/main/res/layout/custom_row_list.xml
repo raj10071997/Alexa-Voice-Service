@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/ringtoneicon"
+        android:layout_width="@dimen/circular_icon_width_row"
+        android:layout_height="@dimen/circular_icon_height_row"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_music_note_black_24dp" />
+
+    <TextView
+        android:id="@+id/nameOfRingTone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:text="Name"
+        android:textColor="#FFFFFF"
+        android:layout_toLeftOf="@+id/checkicon"
+        android:layout_alignBottom="@+id/ringtoneicon"
+        android:layout_toRightOf="@+id/ringtoneicon"
+        android:textSize="20dp"
+        android:textStyle="italic" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/checkicon"
+        android:layout_width="@dimen/circular_icon_width_row"
+        android:layout_height="@dimen/circular_icon_height_row"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_check_black_24dp"
+        android:visibility="invisible"
+        />
+
+
+
+</RelativeLayout>
