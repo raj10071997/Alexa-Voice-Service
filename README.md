@@ -20,13 +20,16 @@ It is implementation of alexa voice service in android app. The app also include
    
    See below screeshots
    
-   ![1](https://user-images.githubusercontent.com/24502136/28382555-251d4fbe-6cdc-11e7-8187-f65c7c265bb3.jpg)
+   ![s1_2](https://user-images.githubusercontent.com/24502136/34360749-b9764898-ea89-11e7-9586-c2c82565b5e0.png)
    
-   ![2](https://user-images.githubusercontent.com/24502136/28382707-b510074c-6cdc-11e7-9643-d65785ab5c00.jpg)
+   ![s3_3](https://user-images.githubusercontent.com/24502136/34360751-b9cd0fd4-ea89-11e7-914a-d65559892764.png)
    
-   ![3](https://user-images.githubusercontent.com/24502136/28382706-b50bfa76-6cdc-11e7-851c-25833ba06586.jpg)
+   ![s4_2](https://user-images.githubusercontent.com/24502136/34360752-b9f648e0-ea89-11e7-8a27-a72a565e69a3.png)
    
-   ![4](https://user-images.githubusercontent.com/24502136/28382708-b5351d34-6cdc-11e7-8df4-80f3ea95087f.jpg)
+   ![s2_2](https://user-images.githubusercontent.com/24502136/34360750-b9a33de4-ea89-11e7-93a5-2cc256207aba.png)
+   
+   ![s5_2](https://user-images.githubusercontent.com/24502136/34360753-ba684e40-ea89-11e7-803a-7846bdd76e21.png)
+   
    
    You can delete the alarm from the list by long pressing the desired alarm.
    
