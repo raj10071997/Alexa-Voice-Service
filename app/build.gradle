@@ -29,6 +29,7 @@ dependencies {
     implementation files('additionnal.jar')
     implementation files('mail.jar')
     implementation files('activation.jar')
+    //duplicate dependence - reason for unable to merge dex
     //implementation files('okio-1.13.0.jar')
 
     //otto is deprecated
