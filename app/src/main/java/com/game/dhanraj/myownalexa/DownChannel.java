@@ -155,10 +155,6 @@ public class DownChannel extends Service {
         {
             Log.d("openDownChannel","failed");
 
-           /* Intent i = new Intent(DownChannel.this,MainActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);*/
-
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
@@ -166,7 +162,14 @@ public class DownChannel extends Service {
                             Toast.LENGTH_SHORT).show();
                 }
             });
-            tokenHandler.getAccessToken(TokenHandler.DownChannelCase1);
+
+            Intent i = new Intent(DownChannel.this,MainActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+
+            stopSelf();
+
+           // tokenHandler.getAccessToken(TokenHandler.DownChannelCase1);
 
            /*openDownChannel();
             new Handler(Looper.getMainLooper()).post(new Runnable() {
