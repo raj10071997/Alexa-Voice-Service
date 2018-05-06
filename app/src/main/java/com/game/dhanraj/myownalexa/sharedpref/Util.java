@@ -27,14 +27,11 @@ public class Util {
         return mPreferences;
     }
 
-
-    public static String getIdentifier()
-    {
+    public static String getIdentifier() {
         return (mPreferences!=null)?mPreferences.getString(IDENTIFIER,""):"";
     }
 
-
-    public static String getUuid(){
+    public static String getUuid() {
         String prefix=(TextUtils.isEmpty(getIdentifier()))?"":getIdentifier()+".";
         return prefix + UUID.randomUUID().toString();
     }
@@ -44,6 +41,4 @@ public class Util {
             client = new OkHttpClient();
         return client;
     }
-
-
 }

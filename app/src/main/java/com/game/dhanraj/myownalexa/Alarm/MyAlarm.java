@@ -44,7 +44,6 @@ public class MyAlarm extends AppCompatActivity {
     private boolean mBounded;
     private Toolbar toolbar;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +77,6 @@ public class MyAlarm extends AppCompatActivity {
             @Override
             public void onClick(View view, final int position) {
                 //Values are passing to activity & to fragment as well
-
             }
 
             @Override
@@ -93,8 +91,7 @@ public class MyAlarm extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-      refreshData();
-
+        refreshData();
     }
 
     @Override
@@ -102,11 +99,9 @@ public class MyAlarm extends AppCompatActivity {
         super.onStart();
         Intent mIntent = new Intent(this,DownChannel.class);
         bindService(mIntent, mConnection, BIND_AUTO_CREATE);
-
     }
 
     ServiceConnection mConnection = new ServiceConnection() {
-
         public void onServiceDisconnected(ComponentName name) {
             mBounded = false;
             downChannel = null;
@@ -134,7 +129,6 @@ public class MyAlarm extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             finish(); // close this activity and return to preview activity (if there is any)
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -144,12 +138,10 @@ public class MyAlarm extends AppCompatActivity {
     }
 
     class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
-
         private ClickListener clicklistener;
         private GestureDetector gestureDetector;
 
         public RecyclerTouchListener(Context context, final RecyclerView recycleView, final ClickListener clicklistener){
-
             this.clicklistener=clicklistener;
             gestureDetector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
                 @Override
@@ -173,7 +165,6 @@ public class MyAlarm extends AppCompatActivity {
             if(child!=null && clicklistener!=null && gestureDetector.onTouchEvent(e)){
                 clicklistener.onClick(child,rv.getChildAdapterPosition(child));
             }
-
             return false;
         }
 
@@ -207,7 +198,6 @@ public class MyAlarm extends AppCompatActivity {
                                 // get user input and set it to result
                                 // edit text
                                 delete(ID,position,view);
-
                             }
                         })
                 .setNegativeButton("Cancel",
@@ -227,7 +217,6 @@ public class MyAlarm extends AppCompatActivity {
 
     private void delete(int ID,int position, View view) {
         db.deleteTheRow(ID);
-
        // downChannel.cancelPendingIntent(ID);
 
         Intent i = new Intent(MyAlarm.this, AlarmReceiver.class);
@@ -237,16 +226,10 @@ public class MyAlarm extends AppCompatActivity {
         Snackbar.make(view, "No Internet Connectivity", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         refreshData();
-
-
     }
 
     private void refreshData() {
         recyclerViewForAlarmAndTimer = new RecyclerViewForAlarmAndTimer(this);
         recyclerView.swapAdapter(recyclerViewForAlarmAndTimer,false);
     }
-
-
-
-
 }

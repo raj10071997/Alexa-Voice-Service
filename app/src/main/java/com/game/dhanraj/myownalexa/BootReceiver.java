@@ -15,7 +15,6 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
         //start our service in the background
         Intent stickyIntent = new Intent(context, DownChannel.class);
         context.startService(stickyIntent);

@@ -24,12 +24,9 @@ public class DataBase extends SQLiteOpenHelper {
             " ("+"_id"+" INTEGER PRIMARY KEY AUTOINCREMENT,"+"AlarmOrTimer"+ " TEXT,"+"iconId"+" INTEGER,"+
            "TimeInMilli"+" LONG,"+ "Time"+ " TEXT)";
 
-
-
     public DataBase(Context context) {
         super(context, "DatabaseOfAlarm", null, 1);
     }
-
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -38,6 +35,8 @@ public class DataBase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
+
+        //check the below statement
         db.execSQL("DROP TABLE IF IT EXISTS "+ "ListofAlarms");
         onCreate(db);
     }
@@ -47,7 +46,6 @@ public class DataBase extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-
         contentValues.put("Time",myTime);
         contentValues.put("AlarmOrTimer",type);
         contentValues.put("iconId", R.drawable.ic_alarm_on_black_24dp);
@@ -56,14 +54,11 @@ public class DataBase extends SQLiteOpenHelper {
         db.insert("ListofAlarms",null,contentValues);
         Log.d("DHANRAJ","check1");
         db.close();
-
     }
 
     public ArrayList<AlarmConstants> getDetailsOfAlarmAndTime(){
         SQLiteDatabase db = this.getWritableDatabase();
-
         myList.clear();
-
         Cursor cursor = db.query("ListofAlarms",new String[]{"_id",
                         "AlarmOrTimer","Time","iconId"},
                null,null,null,null,null);
@@ -83,29 +78,21 @@ public class DataBase extends SQLiteOpenHelper {
         }
 
         db.close();
-
         return  myList;
-
     }
 
     public void deleteTheRow(int id) {
-
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("ListofAlarms","_id" +" = "+id,null);
         db.close();
     }
 
     public int getID() {
-
         SQLiteDatabase db = this.getWritableDatabase();
-
-
         Cursor cursor = db.query("ListofAlarms",new String[]{"_id",
                         },
                 null,null,null,null,null);
-
         int id=0;
-
         if(cursor.moveToFirst())
         {
             do{
@@ -113,16 +100,12 @@ public class DataBase extends SQLiteOpenHelper {
 
             }while(cursor.moveToNext());
         }
-
         db.close();
-
         return  id;
     }
 
     public int getTime() {
         SQLiteDatabase db = this.getWritableDatabase();
-
-
         Cursor cursor = db.query("ListofAlarms",new String[]{"TimeInMilli","_id"
                 },
                 null,null,null,null,"TimeInMilli ASC");
@@ -146,22 +129,16 @@ public class DataBase extends SQLiteOpenHelper {
         }*/
 
         db.close();
-
-
-
         return id;
     }
 
     public void deleteTimeRow(int idtocancelled) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         db.delete("ListofAlarms","_id" +" = "+idtocancelled,null);
         db.close();
-
     }
 
-    public int getLastRowID()
-    {
+    public int getLastRowID() {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT ROWID from MYTABLE order by ROWID DESC limit 1";
         Cursor c = db.query("ListofAlarms",new String[]{"_id"},null,null,null,null,"_id DESC");
@@ -169,10 +146,6 @@ public class DataBase extends SQLiteOpenHelper {
         if (c != null && c.moveToFirst()) {
             lastId = c.getInt(0);
         }
-
         return lastId;
     }
-
-
-
 }

@@ -9,8 +9,6 @@ public class Event {
     Header header;
     Payload payload;
 
-
-
     public static class Header{
         String namespace;
         String name;
@@ -72,8 +70,5 @@ public class Event {
         Event event = new Event();
         Header header = new Header();
         Payload payload = new Payload();
-
     }
-
-
 }

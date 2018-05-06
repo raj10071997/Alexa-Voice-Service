@@ -27,7 +27,6 @@ import com.game.dhanraj.myownalexa.sharedpref.Util;
  */
 public class NavigationFragment extends Fragment {
 
-
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private View containerView;
@@ -49,8 +48,7 @@ public class NavigationFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mUserLearnedDrawer = Boolean.valueOf(readFromPreferences(getActivity(),KEY_USER_LEARNED_DRAWER,"false"));
-        if(savedInstanceState!=null)
-        {
+        if(savedInstanceState!=null) {
             mFromSavedInstanceState=true;
         }
     }
@@ -101,14 +99,13 @@ public class NavigationFragment extends Fragment {
     }
 
     public void setUp(int fragmentId,DrawerLayout drawerLayout,Toolbar toolbar) {
-         containerView = getActivity().findViewById(fragmentId);
+        containerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
         mDrawerToggle = new ActionBarDrawerToggle(getActivity(),drawerLayout,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close){
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                if(mUserLearnedDrawer==false)
-                {
+                if(!mUserLearnedDrawer) {
                     mUserLearnedDrawer=true;
                     saveToPreferences(getActivity(),KEY_USER_LEARNED_DRAWER, String.valueOf(mUserLearnedDrawer));
                 }
@@ -122,16 +119,13 @@ public class NavigationFragment extends Fragment {
                 getActivity().invalidateOptionsMenu();
             }
         };
-        if(!mFromSavedInstanceState && !mUserLearnedDrawer)
-        {
+        if(!mFromSavedInstanceState && !mUserLearnedDrawer) {
             mDrawerLayout.openDrawer(containerView);
         }
 
         //it is deprecated find new method or way
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
        // mDrawerToggle.syncState();
-
         mDrawerLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -140,18 +134,14 @@ public class NavigationFragment extends Fragment {
         });
     }
 
-    public static void saveToPreferences(Context context,String preferenceName, String preferenceValue)
-    {
+    public static void saveToPreferences(Context context,String preferenceName, String preferenceValue) {
         SharedPreferences.Editor preferences = Util.getPrefernces(context).edit();
         preferences.putString(preferenceName,preferenceValue);
         preferences.apply();
     }
 
-    public static String readFromPreferences(Context context,String preferenceName, String defaultValue)
-    {
+    public static String readFromPreferences(Context context,String preferenceName, String defaultValue) {
         SharedPreferences preferences = Util.getPrefernces(context);
         return preferences.getString(preferenceName,defaultValue);
-
     }
-
 }

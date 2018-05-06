@@ -34,8 +34,6 @@ import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
 
 public class TokenHandler {
 
-
-
     public Context myContext;
     public String myresponse;
     private String REFRESH_TOKEN;
@@ -50,7 +48,6 @@ public class TokenHandler {
     public static final int SendPlaybackStartedEvent = 108;
     public static final int SplashActivity = 109;
     public static final int FinishMainActivity = 110;
-
 
     public TokenHandler(Context context) {
         myContext = context;
@@ -67,14 +64,11 @@ public class TokenHandler {
               //  return preferences.getString(PREF_ACCESS_TOKEN, null);
                 String accessToken = preferences.getString(PREF_ACCESS_TOKEN,null);
                 EventBus.getDefault().post(new MessageEvent(event,accessToken));
-
             } else {
                 //if it is expired but we have a refresh token, get a new token
-
                 if (preferences.contains(PREF_REFRESH_TOKEN)) {
                     Log.d("expired","doesnotcontains");
                     getRefreshToken(preferences.getString(PREF_REFRESH_TOKEN, ""),event);
-
                 }
             }
         }
@@ -88,20 +82,15 @@ public class TokenHandler {
                 .add("client_id", Util.getPrefernces(myContext).getString("clientId",""))
                 .build();
         doPostRequest(formBody,event);
-
     }
 
     public void doPostRequest(final RequestBody form, final int checkRefreshTokenEvent) {
-
         OkHttpClient okclient = getOkhttp();
         Request request = new Request.Builder()
                 .url("https://api.amazon.com/auth/O2/token")
                 .post(form)
                 .build();
         Response response=null;
-
-
-
         okclient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -109,30 +98,23 @@ public class TokenHandler {
                 Log.d("accessToken","failed");
                 doPostRequest(form,checkRefreshTokenEvent);
             }
-
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 SharedPreferences preferences = Util.getPrefernces(myContext);
                 myresponse = response.body().string();
-
-
                 TokenResponse tokenResponse = new Gson().fromJson(myresponse, TokenResponse.class);
                 saveToken(tokenResponse);
-
-                if(checkRefreshTokenEvent==FirstMainActivityDoPostRequest)
-                {
+                if(checkRefreshTokenEvent==FirstMainActivityDoPostRequest) {
                     Intent st = new Intent(myContext,DownChannel.class);
                     myContext.startService(st);
-                }else
+                } else
                     EventBus.getDefault().post(new MessageEvent(checkRefreshTokenEvent,preferences.getString(PREF_ACCESS_TOKEN,null)));
-
             }
         });
     }
 
 
     public void saveToken(final TokenResponse tokenResponse) {
-
         REFRESH_TOKEN = tokenResponse.refresh_token;
         ACCESS_TOKEN = tokenResponse.access_token;
         SharedPreferences.Editor preferences = Util.getPrefernces(myContext).edit();
@@ -140,14 +122,12 @@ public class TokenHandler {
         preferences.putString(PREF_REFRESH_TOKEN, REFRESH_TOKEN);
         //comes back in seconds, needs to be milis
         preferences.putLong(PREF_TOKEN_EXPIRES, (System.currentTimeMillis() + tokenResponse.expires_in * 1000));
-
        /* new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 Toast.makeText(myContext, String.valueOf(tokenResponse.expires_in) , Toast.LENGTH_SHORT).show();
             }
         });*/
-
         preferences.apply();
     }
 
@@ -158,5 +138,4 @@ public class TokenHandler {
         public String token_type;
         public long expires_in;
     }
-
 }

@@ -26,7 +26,6 @@ public class recorderView extends View {
 
     private float rmsdbLevel = 0;
 
-
     Drawable microphone;
 
     public recorderView(Context context) {
@@ -72,7 +71,6 @@ public class recorderView extends View {
         }
 
         microphone.draw(canvas);
-
     }
 
  /*   @Override

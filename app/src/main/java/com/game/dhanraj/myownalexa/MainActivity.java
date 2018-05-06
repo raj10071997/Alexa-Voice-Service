@@ -61,11 +61,9 @@ import static com.game.dhanraj.myownalexa.AccessConstant.CodeVerifierandChalleng
 
 //The authorization code changes everytime you open the app for the first time so you have to get the authorization code everytime you login till your access
 public class MainActivity extends AppCompatActivity {
-    
-    
+
     //Fill in the Device type ID here or Application type ID
     private static final String PRODUCT_ID = "DhanrajCompanionProduct";
-
     public TokenHandler tokenHanlder;
     private RequestContext mRequestContext;
     public static Context myContext;
@@ -74,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     private String codeVerifier;
     private static String authCode, redirectURI, clientID;
     private static String codeChallenge;
-
     private TextView txt;
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
@@ -98,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
     //private SharedPreferences preferences;
     SharedPreferences validation;
     SharedPreferences.Editor editorValidation;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,8 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
                 if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
                 intiLogi();
-                else
-                {
+                else {
                     Snackbar.make(v, "No Internet Connectivity", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
@@ -158,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
         EventBus.getDefault().register(this);
 
         /*ConnectivityManager connectivityManager
@@ -177,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
         }*/
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -191,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onMessageEvent(MessageEvent event){
+    public void onMessageEvent(MessageEvent event) {
         switch (event.event){
             case TokenHandler.FinishMainActivity:
                 finish();
@@ -214,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
     @Override
     public void onBackPressed() {
          DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -234,17 +226,14 @@ public class MainActivity extends AppCompatActivity {
                /* Intent i = new Intent(MainActivity.this, MyAlarm.class);
                 startActivity(i);*/
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
     public void intiLogi() {
-
         final JSONObject scopeData = new JSONObject();
         final JSONObject productInstanceAttributes = new JSONObject();
-
         try {
             productInstanceAttributes.put("deviceSerialNumber", PRODUCT_DSN);
             scopeData.put("productInstanceAttributes", productInstanceAttributes);
@@ -262,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private class AuthorizeListenerImpl extends AuthorizeListener {
-
         /* Authorization was completed successfully. */
         @Override
         public void onSuccess(final AuthorizeResult authorizeResult) {
@@ -271,19 +259,18 @@ public class MainActivity extends AppCompatActivity {
             final String clientId = authorizeResult.getClientId();
             CLIENTID = clientId;
 
-                    SharedPreferences.Editor  preferences = Util.getPrefernces(myContext).edit();
-                    preferences.putString("clientID",clientId);
-                    preferences.apply();
-                    RequestBody formBody = new FormBody.Builder()
-                            .add("grant_type", "authorization_code")
-                            .add("code", authorizationCode)
-                            .add("redirect_uri", redirectUri)
-                            .add("client_id", clientId)
-                            .add("code_verifier", codeVerifier)
-                            .build();
+            SharedPreferences.Editor  preferences = Util.getPrefernces(myContext).edit();
+            preferences.putString("clientID",clientId);
+            preferences.apply();
+            RequestBody formBody = new FormBody.Builder()
+                    .add("grant_type", "authorization_code")
+                    .add("code", authorizationCode)
+                    .add("redirect_uri", redirectUri)
+                    .add("client_id", clientId)
+                    .add("code_verifier", codeVerifier)
+                    .build();
 
-                    tokenHanlder.doPostRequest(formBody,TokenHandler.FirstMainActivityDoPostRequest);
-
+            tokenHanlder.doPostRequest(formBody,TokenHandler.FirstMainActivityDoPostRequest);
         }
 
         /* There was an error during the attempt to authorize the application. */
@@ -308,6 +295,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-
-
 }

@@ -15,7 +15,6 @@ public class LoginView extends View {
 
     Paint backgroundPaint;
     Paint progressPaint;
-
     Drawable loginBtn;
 
     public LoginView(Context context) {
@@ -39,6 +38,5 @@ public class LoginView extends View {
     }
 
     private void init(){
-
     }
 }

@@ -11,7 +11,6 @@ import android.util.Log;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
-
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("we are in the receiver","hope ki chal jaye");
@@ -21,6 +20,5 @@ public class AlarmReceiver extends BroadcastReceiver {
         Intent i = new Intent(context,AlarmService.class);
         i.putExtra("extra",alrm);
         context.startService(i);
-
     }
 }

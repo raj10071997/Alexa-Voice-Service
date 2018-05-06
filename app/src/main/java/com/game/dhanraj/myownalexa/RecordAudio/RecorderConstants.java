@@ -20,16 +20,12 @@ public class RecorderConstants {
     public static int bufferSize;
     public static int AudioSource;
 
-
-    public RecorderConstants(int sampleRate)
-    {
+    public RecorderConstants(int sampleRate) {
         this.AudioSource = MediaRecorder.AudioSource.VOICE_RECOGNITION;
         mSampleRate=sampleRate;
         bufferSize = getBufferSize();
         framePeriod = bufferSize / (2 * RESOLUTION_IN_BYTES * CHANNELS);
     }
-
-
 
     private int getBufferSize(){
         //the function below gives min buffer size which is necesaary for audio recording

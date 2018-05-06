@@ -11,7 +11,6 @@ import android.webkit.WebViewClient;
 public class LoginWebViewActivity extends Activity {
 
     private WebView webView;
-
     private static final int RESULT_LOGIN = 1;
 
     @Override
@@ -25,13 +24,12 @@ public class LoginWebViewActivity extends Activity {
         Intent i =  getIntent();
         Uri data = i.getData();
 
-        if(data!=null){
+        if(data!=null) {
             webView.loadUrl(data.toString());
-        }else{
+        } else {
             finish();
         }
     }
-
 
     WebViewClient mWebClient = new WebViewClient(){
         @Override
@@ -39,11 +37,9 @@ public class LoginWebViewActivity extends Activity {
             if(request.getUrl().toString().startsWith("http") || request.getUrl().toString().startsWith("https")){
                 return super.shouldOverrideUrlLoading(view,request);
             }
-
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(request.getUrl().toString()));
             startActivityForResult(i,RESULT_LOGIN);
-
             return true;
         }
     };
