@@ -172,6 +172,7 @@ public class SendingAudio extends AppCompatActivity {
                     }
                     stopListening();
                     checkRecordButton=true;
+                    return true;  // I have changed this line on 17th march seeing SUSI AI
                 }
 
                 return false;
