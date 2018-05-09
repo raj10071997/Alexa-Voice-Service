@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
             navigationFragment.setUp(R.id.navigation_fragment,(DrawerLayout)findViewById(R.id.drawer_layout),toolbar);
         }
 
-
     @Override
     protected void onStart() {
         super.onStart();
