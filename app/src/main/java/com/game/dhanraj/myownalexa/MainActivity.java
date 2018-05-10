@@ -3,23 +3,20 @@ package com.game.dhanraj.myownalexa;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +29,8 @@ import com.amazon.identity.auth.device.api.authorization.AuthorizeResult;
 import com.amazon.identity.auth.device.api.authorization.ScopeFactory;
 import com.amazon.identity.auth.device.api.workflow.RequestContext;
 import com.game.dhanraj.myownalexa.AccessConstant.CodeVerifierandChallengeMethods;
-import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
 import com.game.dhanraj.myownalexa.NavigationDrawer.NavigationFragment;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
-import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -43,20 +38,17 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 import static com.game.dhanraj.myownalexa.AccessConstant.CodeVerifierandChallengeMethods.generateCodeChallenge;
+import static com.game.dhanraj.myownalexa.Constants.BASE_THEME;
+import static com.game.dhanraj.myownalexa.Constants.BASE_THEME_INTEGER;
+import static com.game.dhanraj.myownalexa.Constants.DARK_THEME;
 
 
 //The authorization code changes everytime you open the app for the first time so you have to get the authorization code everytime you login till your access
@@ -66,33 +58,26 @@ public class MainActivity extends AppCompatActivity {
     private static final String PRODUCT_ID = "DhanrajCompanionProduct";
     public TokenHandler tokenHanlder;
     private RequestContext mRequestContext;
-    public static Context myContext;
+    private Context myContext;
     private static String PRODUCT_DSN;
     private static String CODE_CHALLENGE_METHOD = "S256";
     private String codeVerifier;
     private static String authCode, redirectURI, clientID;
     private static String codeChallenge;
-    private TextView txt;
-    public static final MediaType JSON
+    private int theme, themeInteger;
+    private static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
 
     private CircleImageView Loginbtn;
     private Toolbar toolbar;
 
-    private static String myresponse;
-    public static String CLIENTID;
-
     public static DownChannel dwn;
-
-    public final static String PREF_ACCESS_TOKEN = "access_token_042017";
-    public final static String PREF_REFRESH_TOKEN = "refresh_token_042017";
-    public final static String PREF_TOKEN_EXPIRES = "token_expires_042017";
 
     private ProgressDialog progressDialog;
     private static boolean forDownChannel,refreshToken;
     public static boolean CheckInternetConnection,DownChannelestablished;
 
-    //private SharedPreferences preferences;
+    private SharedPreferences preferences;
     SharedPreferences validation;
     SharedPreferences.Editor editorValidation;
 
@@ -103,13 +88,15 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Login");
+
+        preferences = Util.getPrefernces(MainActivity.this);
 
         myContext = MainActivity.this;
 
         mRequestContext = RequestContext.create(this);
         mRequestContext.registerListener(new AuthorizeListenerImpl());
 
-        txt = (TextView) findViewById(R.id.text);
         PRODUCT_DSN = Settings.Secure.getString(getApplicationContext().getContentResolver(),
                 Settings.Secure.ANDROID_ID);
         try {
@@ -120,8 +107,6 @@ public class MainActivity extends AppCompatActivity {
                     + "SHA-256" + " algorithm.", e);
         }
 
-        refreshToken= true;
-        DownChannelestablished = true;
         dwn = new DownChannel();
         tokenHanlder = new TokenHandler(myContext);
 
@@ -173,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        setUpLayout();
         mRequestContext.onResume();
     }
 
@@ -192,8 +178,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
        /* Intent intent = new Intent(MainActivity.this, DownChannel.class);
         MainActivity.this.stopService(intent);*/
@@ -201,14 +186,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main2, menu);
+        /*MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main2, menu);*/
         return true;
     }
 
     @Override
     public void onBackPressed() {
-         DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -219,18 +204,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_settings:
-               /* Intent i = new Intent(MainActivity.this, MyAlarm.class);
-                startActivity(i);*/
-                return true;
+            /*case R.id.action_settings:
+                return true;*/
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void intiLogi() {
+    private void intiLogi() {
         final JSONObject scopeData = new JSONObject();
         final JSONObject productInstanceAttributes = new JSONObject();
         try {
@@ -244,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                     .withProofKeyParameters(codeChallenge, CODE_CHALLENGE_METHOD)
                     .build());
         } catch (JSONException e) {
-            // handle exception here
+
         }
     }
 
@@ -256,7 +238,6 @@ public class MainActivity extends AppCompatActivity {
             final String authorizationCode = authorizeResult.getAuthorizationCode();
             final String redirectUri = authorizeResult.getRedirectURI();
             final String clientId = authorizeResult.getClientId();
-            CLIENTID = clientId;
 
             SharedPreferences.Editor  preferences = Util.getPrefernces(myContext).edit();
             preferences.putString("clientID",clientId);
@@ -283,6 +264,20 @@ public class MainActivity extends AppCompatActivity {
         public void onCancel(final AuthCancellation authCancellation) {
             Toast.makeText(MainActivity.this, "Your authorization has been cancelled. Please try again.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+
+    private void setUpLayout() {
+        theme = preferences.getInt(BASE_THEME, ContextCompat.getColor(MainActivity.this, R.color.light_background));
+        themeInteger = preferences.getInt(BASE_THEME_INTEGER, 1);
+        findViewById(R.id.activity_main).setBackgroundColor(theme);
+        int oppositeTheme;
+        if (themeInteger == DARK_THEME)
+            oppositeTheme = ContextCompat.getColor(MainActivity.this, R.color.light_background);
+        else
+            oppositeTheme = ContextCompat.getColor(MainActivity.this, R.color.dark_background);
+
+        ((TextView) findViewById(R.id.main_activity_text)).setTextColor(oppositeTheme);
     }
 
     public boolean isMyServiceRunning(Class<?> serviceClass) {

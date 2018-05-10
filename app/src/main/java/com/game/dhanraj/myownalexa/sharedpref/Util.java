@@ -15,9 +15,9 @@ import okhttp3.OkHttpClient;
 
 public class Util {
 
-    public static SharedPreferences mPreferences;
-    public static final String IDENTIFIER = "identifier";
-    public static OkHttpClient client;
+    private static SharedPreferences mPreferences;
+    private static final String IDENTIFIER = "identifier";
+    private static OkHttpClient client;
 
     public static SharedPreferences getPrefernces(Context context){
         if(mPreferences==null)
@@ -27,7 +27,7 @@ public class Util {
         return mPreferences;
     }
 
-    public static String getIdentifier() {
+    private static String getIdentifier() {
         return (mPreferences!=null)?mPreferences.getString(IDENTIFIER,""):"";
     }
 
@@ -41,4 +41,6 @@ public class Util {
             client = new OkHttpClient();
         return client;
     }
+
+
 }

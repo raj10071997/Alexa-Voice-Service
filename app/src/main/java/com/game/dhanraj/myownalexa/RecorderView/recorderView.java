@@ -102,4 +102,9 @@ public class recorderView extends View {
         rmsdbLevel = level;
         postInvalidate();
     }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
 }

@@ -2,6 +2,7 @@ package com.game.dhanraj.myownalexa;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -10,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
@@ -23,7 +25,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -38,7 +39,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
-import com.game.dhanraj.myownalexa.NavigationDrawer.NavigationFragment;
 import com.game.dhanraj.myownalexa.RecordAudio.RecordAudioinBytes;
 import com.game.dhanraj.myownalexa.RecordAudio.RecorderConstants;
 import com.game.dhanraj.myownalexa.RecorderView.recorderView;
@@ -75,6 +75,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
 
+import static com.game.dhanraj.myownalexa.Constants.BASE_THEME;
+import static com.game.dhanraj.myownalexa.Constants.BASE_THEME_INTEGER;
+import static com.game.dhanraj.myownalexa.Constants.DARK_THEME;
 import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
 
 /**
@@ -85,7 +88,6 @@ public class SendingAudio extends AppCompatActivity {
 
     private Button btn;
     private recorderView record;
-   // private newMicroPhoneView mymicro;
     private RecorderConstants recorderConstants;
     public  RecordAudioinBytes recordAudioinBytes;
     private static final int AUDIO_RATE = 16000;
@@ -101,29 +103,33 @@ public class SendingAudio extends AppCompatActivity {
     private AlarmManager alarmManager;
     public TokenHandler tokenHandler;
     private Toolbar toolbar;
+    private int theme, themeInteger;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.send_audio_drawer);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar4);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        tokenHandler = new TokenHandler(this);
+        getSupportActionBar().setTitle("Talk Box");
         stateofbtn = (TextView) findViewById(R.id.stateofbutton);
+        record = (recorderView) findViewById(R.id.sendAudiobtn);
+
+        SharedPreferences preferences = Util.getPrefernces(SendingAudio.this);
+        theme = preferences.getInt(BASE_THEME, ContextCompat.getColor(SendingAudio.this, R.color.light_background));
+        themeInteger = preferences.getInt(BASE_THEME_INTEGER, 1);
+        setUpLayout();
+
+        tokenHandler = new TokenHandler(this);
+
         down = new DownChannel();
         asyncDialog = new ProgressDialog(SendingAudio.this);
         mediaPlayer = new MediaPlayer();
-        record = (recorderView) findViewById(R.id.sendAudiobtn);
-
-        //mymicro = (newMicroPhoneView) findViewById(R.id.);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        NavigationFragment navigationFragment = (NavigationFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_fragment2);
-        navigationFragment.setUp(R.id.navigation_fragment2,(DrawerLayout)findViewById(R.id.drawer_layout2),toolbar);
 
         record.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -131,7 +137,6 @@ public class SendingAudio extends AppCompatActivity {
                 if (event.getAction() == MotionEvent.ACTION_DOWN ) {
                     if ( ContextCompat.checkSelfPermission(SendingAudio.this, Manifest.permission.RECORD_AUDIO  )
                             != PackageManager.PERMISSION_GRANTED) {
-
 
                         ActivityCompat.requestPermissions(SendingAudio.this,
                                 new String[]{Manifest.permission.RECORD_AUDIO},
@@ -142,25 +147,21 @@ public class SendingAudio extends AppCompatActivity {
                                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
                         if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
-
                             if (recordAudioinBytes == null) {
                                 //if mediaplayer is not playing
-                                if (!mediaPlayer.isPlaying() && checkRecordButton){
+                                if (!mediaPlayer.isPlaying() && checkRecordButton) {
                                     send();
                                     Toast.makeText(SendingAudio.this, "Speak", Toast.LENGTH_SHORT).show();
                                     checkRecordButton = false;
                                 }
                             }
-                        } else
-                        {
+                        } else {
                             Snackbar.make(v, "No Internet Connectivity", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
                     }
                     return true;
-                }else if(event.getAction() == MotionEvent.ACTION_UP)
-                {
-
+                } else if(event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
@@ -168,15 +169,13 @@ public class SendingAudio extends AppCompatActivity {
                     }
                     stopListening();
                     checkRecordButton=true;
-                    return true;  // I have changed this line on 17th march seeing SUSI AI
+                    return true;
                 }
-
                 return false;
             }
         });
         EventBus.getDefault().post(new MessageEvent(TokenHandler.SplashActivity,"finishSplashActivity"));
         EventBus.getDefault().post(new MessageEvent(TokenHandler.FinishMainActivity,""));
-
     }
 
     @Override
@@ -188,11 +187,13 @@ public class SendingAudio extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                /*Intent i = new Intent(SendingAudio.this, MyAlarm.class);
-                startActivity(i);*/
+            case R.id.action_alarm:
+                Intent i = new Intent(SendingAudio.this, MyAlarm.class);
+                startActivity(i);
+                return true;
+            case android.R.id.home:
+                onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -204,6 +205,14 @@ public class SendingAudio extends AppCompatActivity {
         super.onDestroy();
         Intent intent = new Intent(SendingAudio.this, DownChannel.class);
         SendingAudio.this.stopService(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(SendingAudio.this, MainActivity.class);
+        startActivity(i);
+        finish();
     }
 
     @Override
@@ -234,11 +243,11 @@ public class SendingAudio extends AppCompatActivity {
                             Manifest.permission.RECORD_AUDIO)) {
                         new AlertDialog.Builder(this).
                                 setTitle("Record Audio Permission").
-                                setMessage("you need to grant this permission in order to record audio");
+                                setMessage("You need to grant this permission in order to record audio");
                     } else {
                         new AlertDialog.Builder(this)
                                 .setTitle("Record Audio Permission")
-                                .setMessage("you have denied this permission.Now you have to go to settings to enable it");
+                                .setMessage("You have denied this permission.Now you have to go to settings to enable it");
                     }
                 }
                 return;
@@ -714,7 +723,7 @@ public class SendingAudio extends AppCompatActivity {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(SendingAudio.this, "you can send another request or can send the previous request if you didn't get any response",
+                    Toast.makeText(SendingAudio.this, "You can send another request or can send the previous request if you didn't get any response",
                             Toast.LENGTH_SHORT).show();
                 }
             });
@@ -890,6 +899,7 @@ public class SendingAudio extends AppCompatActivity {
     };
 
     public void stopListening(){
+
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
@@ -903,4 +913,16 @@ public class SendingAudio extends AppCompatActivity {
             recordAudioinBytes = null;
         }
     }
+
+    @SuppressLint("ResourceAsColor")
+    private void setUpLayout() {
+        findViewById(R.id.send_audio_layout).setBackgroundColor(theme);
+        int oppositeTheme;
+        if (themeInteger == DARK_THEME)
+            oppositeTheme = ContextCompat.getColor(SendingAudio.this, R.color.light_background);
+        else
+            oppositeTheme = ContextCompat.getColor(SendingAudio.this, R.color.dark_background);
+        stateofbtn.setTextColor(oppositeTheme);
+    }
+
 }

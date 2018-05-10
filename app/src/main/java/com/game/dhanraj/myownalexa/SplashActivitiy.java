@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,8 +18,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import static com.game.dhanraj.myownalexa.MainActivity.PREF_REFRESH_TOKEN;
-import static java.lang.Thread.sleep;
+import static com.game.dhanraj.myownalexa.Constants.BASE_THEME;
+import static com.game.dhanraj.myownalexa.Constants.PREF_REFRESH_TOKEN;
 
 public class SplashActivitiy extends AppCompatActivity {
 
@@ -30,8 +31,10 @@ public class SplashActivitiy extends AppCompatActivity {
         setContentView(R.layout.activity_splash_activitiy);
         EventBus.getDefault().register(this);
 
-        new Handler().postDelayed(new Runnable() {
+        int theme = Util.getPrefernces(SplashActivitiy.this).getInt(BASE_THEME, ContextCompat.getColor(SplashActivitiy.this, R.color.light_background));
+        findViewById(R.id.splash_layout).setBackgroundColor(theme);
 
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 SharedPreferences preferences= Util.getPrefernces(SplashActivitiy.this);

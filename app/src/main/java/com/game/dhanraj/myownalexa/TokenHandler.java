@@ -3,10 +3,7 @@ package com.game.dhanraj.myownalexa;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 import com.google.gson.Gson;
@@ -23,9 +20,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.game.dhanraj.myownalexa.MainActivity.PREF_ACCESS_TOKEN;
-import static com.game.dhanraj.myownalexa.MainActivity.PREF_REFRESH_TOKEN;
-import static com.game.dhanraj.myownalexa.MainActivity.PREF_TOKEN_EXPIRES;
+import static com.game.dhanraj.myownalexa.Constants.PREF_ACCESS_TOKEN;
+import static com.game.dhanraj.myownalexa.Constants.PREF_REFRESH_TOKEN;
+import static com.game.dhanraj.myownalexa.Constants.PREF_TOKEN_EXPIRES;
 import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
 
 /**
@@ -38,6 +35,7 @@ public class TokenHandler {
     public String myresponse;
     private String REFRESH_TOKEN;
     private String ACCESS_TOKEN;
+
     public static final int FirstMainActivityDoPostRequest = 101;
     public static final int DownChannelCase1 = 102;
     public static final int DownChannelCase2 = 103;

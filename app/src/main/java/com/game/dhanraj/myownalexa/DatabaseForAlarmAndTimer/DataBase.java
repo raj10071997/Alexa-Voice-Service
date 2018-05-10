@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.game.dhanraj.myownalexa.Alarm.AlarmConstants;
 import com.game.dhanraj.myownalexa.R;
@@ -35,15 +34,12 @@ public class DataBase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-
-        //check the below statement
-        db.execSQL("DROP TABLE IF IT EXISTS "+ "ListofAlarms");
+        db.execSQL("DROP TABLE IF EXISTS "+ "ListofAlarms");
         onCreate(db);
     }
 
 
     public void addAlarm(String myTime, String type,Long myTimeinmili) {
-
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("Time",myTime);
@@ -52,7 +48,6 @@ public class DataBase extends SQLiteOpenHelper {
         contentValues.put("TimeInMilli",myTimeinmili);
 
         db.insert("ListofAlarms",null,contentValues);
-        Log.d("DHANRAJ","check1");
         db.close();
     }
 
@@ -63,18 +58,15 @@ public class DataBase extends SQLiteOpenHelper {
                         "AlarmOrTimer","Time","iconId"},
                null,null,null,null,null);
 
-        if(cursor.moveToFirst())
-        {
-            do{
+        if(cursor.moveToFirst()) {
+            do {
                 AlarmConstants constants = new AlarmConstants();
-
                 constants.setMytime(cursor.getString(cursor.getColumnIndex("Time")));
                 constants.setAlarmKeyId(cursor.getInt(cursor.getColumnIndex("_id")));
                 constants.setType(cursor.getString(cursor.getColumnIndex("AlarmOrTimer")));
                 constants.setIconsIDs(cursor.getInt(cursor.getColumnIndex("iconId")));
                 myList.add(constants);
-
-            }while(cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
 
         db.close();
@@ -89,16 +81,14 @@ public class DataBase extends SQLiteOpenHelper {
 
     public int getID() {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.query("ListofAlarms",new String[]{"_id",
-                        },
+        Cursor cursor = db.query("ListofAlarms",new String[]{"_id",},
                 null,null,null,null,null);
         int id=0;
-        if(cursor.moveToFirst())
-        {
+        if(cursor.moveToFirst())  {
             do{
                id =  cursor.getInt(cursor.getColumnIndex("_id"));
 
-            }while(cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
         db.close();
         return  id;
@@ -106,15 +96,12 @@ public class DataBase extends SQLiteOpenHelper {
 
     public int getTime() {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.query("ListofAlarms",new String[]{"TimeInMilli","_id"
-                },
+        Cursor cursor = db.query("ListofAlarms",new String[]{"TimeInMilli","_id"},
                 null,null,null,null,"TimeInMilli ASC");
 
         int id=0;
-
         if (cursor != null && cursor.moveToFirst()) {
             id = cursor.getInt(cursor.getColumnIndex("_id"));
-            Log.d("chechIDofalarm",String.valueOf(id));
         }
 
        /* if(cursor.moveToFirst())

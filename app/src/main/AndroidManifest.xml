@@ -84,7 +84,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".AboutActivity" />
-        <activity android:name=".SettingsActivity" />
+        <activity android:name=".SettingsActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".RingtonesActivity"></activity>
     </application>
 

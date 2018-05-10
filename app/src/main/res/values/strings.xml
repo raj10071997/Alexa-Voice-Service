@@ -13,5 +13,16 @@
     <string name="about_license">License</string>
     <string name="about_license_sub">Check MIT License terms used on MyOwnAlexa</string>
     <string name="theme">Theme</string>
+    <string name="general">General</string>
+    <string name="alarm_tone">Alarm Tones</string>
+    <string name="alarm_sub">Set an alarm tone for the alarm</string>
+    <string name="theme_color">Theme Color</string>
+    <string name="theme_sub">Select a primary theme color</string>
+    <string name="basic_theme">Basic Theme</string>
+    <string name="white_basic_theme">White</string>
+    <string name="dark_basic_theme">Dark</string>
+    <string name="dark_amoled_basic_theme">Dark Amoled</string>
+    <string name="ok_action">OK</string>
+    <string name="cancel">CANCEL</string>
 
 </resources>

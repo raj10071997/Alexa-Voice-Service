@@ -15,7 +15,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.Alarm.AlarmReceiver;
-import com.game.dhanraj.myownalexa.Alarm.AlarmService;
 import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
 import com.game.dhanraj.myownalexa.DatabaseForAlarmAndTimer.DataBase;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
@@ -55,6 +54,7 @@ import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
  */
 
 public class DownChannel extends Service {
+
     private String DchannelURL = "https://avs-alexa-eu.amazon.com/v20160207/directives";
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");

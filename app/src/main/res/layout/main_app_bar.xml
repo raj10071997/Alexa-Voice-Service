@@ -26,14 +26,12 @@
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <include
             layout="@layout/app_bar"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
 
         <fragment
             android:id="@+id/navigation_fragment"
@@ -43,7 +41,6 @@
             app:layout="@layout/fragment_navigation_fragment"
             android:name="com.game.dhanraj.myownalexa.NavigationDrawer.NavigationFragment"
             tools:layout="@layout/fragment_navigation_fragment" />
-
 
     </android.support.v4.widget.DrawerLayout>
 
