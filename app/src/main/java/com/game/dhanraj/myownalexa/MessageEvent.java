@@ -9,14 +9,10 @@ public class MessageEvent {
     public int event;
     public String message;
 
-
-
-    public MessageEvent(int event,String Message)
-    {
+    public MessageEvent(int event,String Message) {
         this.event = event;
         this.message = Message;
     }
-
 
     public int getEvent() {
         return event;

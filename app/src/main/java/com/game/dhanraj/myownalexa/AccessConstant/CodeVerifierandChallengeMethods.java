@@ -12,7 +12,6 @@ import java.security.SecureRandom;
 
 public class CodeVerifierandChallengeMethods {
 
-
      public static String generateCodeVerifier() {
         byte[] randomOctetSequence = generateRandomOctetSequence();
         String codeVerifier = base64UrlEncode(randomOctetSequence);
@@ -39,5 +38,4 @@ public class CodeVerifierandChallengeMethods {
 
         return octetSequence;
     }
-
 }

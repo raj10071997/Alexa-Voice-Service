@@ -7,10 +7,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -22,11 +24,14 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.DatabaseForAlarmAndTimer.DataBase;
 import com.game.dhanraj.myownalexa.DownChannel;
 import com.game.dhanraj.myownalexa.R;
+import com.game.dhanraj.myownalexa.sharedpref.Util;
+
+import static com.game.dhanraj.myownalexa.Constants.BASE_THEME;
+import static com.game.dhanraj.myownalexa.Constants.BASE_THEME_INTEGER;
 
 /**
  * Created by Dhanraj on 10-06-2017.
@@ -43,7 +48,7 @@ public class MyAlarm extends AppCompatActivity {
     private DownChannel downChannel;
     private boolean mBounded;
     private Toolbar toolbar;
-
+    private int theme, themeInteger;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,12 +61,17 @@ public class MyAlarm extends AppCompatActivity {
 
         downChannel = new DownChannel();
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar3);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Alarms and Timers");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        SharedPreferences preferences = Util.getPrefernces(MyAlarm.this);
+        theme = preferences.getInt(BASE_THEME, ContextCompat.getColor(MyAlarm.this, R.color.light_background));
+        themeInteger = preferences.getInt(BASE_THEME_INTEGER, 1);
+        setUpLayout();
 
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -78,23 +88,24 @@ public class MyAlarm extends AppCompatActivity {
             @Override
             public void onClick(View view, final int position) {
                 //Values are passing to activity & to fragment as well
-
             }
 
             @Override
             public void onLongClick(View view, int position) {
             AlarmConstants myconst = recyclerViewForAlarmAndTimer.getItem(position);
                 prompts(myconst.getAlarmKeyId(),position,view);
-             //  Toast.makeText(MyAlarm.this,String.valueOf(myconst.getAlarmKeyId())+" "+myconst.getMytime(), Toast.LENGTH_SHORT).show();
             }
         }));
+    }
+
+    private void setUpLayout() {
+        findViewById(R.id.alarm_layout).setBackgroundColor(theme);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-      refreshData();
-
+        refreshData();
     }
 
     @Override
@@ -102,11 +113,9 @@ public class MyAlarm extends AppCompatActivity {
         super.onStart();
         Intent mIntent = new Intent(this,DownChannel.class);
         bindService(mIntent, mConnection, BIND_AUTO_CREATE);
-
     }
 
     ServiceConnection mConnection = new ServiceConnection() {
-
         public void onServiceDisconnected(ComponentName name) {
             mBounded = false;
             downChannel = null;
@@ -130,11 +139,9 @@ public class MyAlarm extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+            finish();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -144,12 +151,10 @@ public class MyAlarm extends AppCompatActivity {
     }
 
     class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
-
         private ClickListener clicklistener;
         private GestureDetector gestureDetector;
 
         public RecyclerTouchListener(Context context, final RecyclerView recycleView, final ClickListener clicklistener){
-
             this.clicklistener=clicklistener;
             gestureDetector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
                 @Override
@@ -173,7 +178,6 @@ public class MyAlarm extends AppCompatActivity {
             if(child!=null && clicklistener!=null && gestureDetector.onTouchEvent(e)){
                 clicklistener.onClick(child,rv.getChildAdapterPosition(child));
             }
-
             return false;
         }
 
@@ -207,7 +211,6 @@ public class MyAlarm extends AppCompatActivity {
                                 // get user input and set it to result
                                 // edit text
                                 delete(ID,position,view);
-
                             }
                         })
                 .setNegativeButton("Cancel",
@@ -227,7 +230,6 @@ public class MyAlarm extends AppCompatActivity {
 
     private void delete(int ID,int position, View view) {
         db.deleteTheRow(ID);
-
        // downChannel.cancelPendingIntent(ID);
 
         Intent i = new Intent(MyAlarm.this, AlarmReceiver.class);
@@ -237,16 +239,10 @@ public class MyAlarm extends AppCompatActivity {
         Snackbar.make(view, "No Internet Connectivity", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         refreshData();
-
-
     }
 
     private void refreshData() {
         recyclerViewForAlarmAndTimer = new RecyclerViewForAlarmAndTimer(this);
         recyclerView.swapAdapter(recyclerViewForAlarmAndTimer,false);
     }
-
-
-
-
 }

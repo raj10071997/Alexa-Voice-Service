@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.game.dhanraj.myownalexa.Alarm.AlarmConstants;
 import com.game.dhanraj.myownalexa.R;
@@ -24,12 +23,9 @@ public class DataBase extends SQLiteOpenHelper {
             " ("+"_id"+" INTEGER PRIMARY KEY AUTOINCREMENT,"+"AlarmOrTimer"+ " TEXT,"+"iconId"+" INTEGER,"+
            "TimeInMilli"+" LONG,"+ "Time"+ " TEXT)";
 
-
-
     public DataBase(Context context) {
         super(context, "DatabaseOfAlarm", null, 1);
     }
-
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -38,100 +34,74 @@ public class DataBase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-        db.execSQL("DROP TABLE IF IT EXISTS "+ "ListofAlarms");
+        db.execSQL("DROP TABLE IF EXISTS "+ "ListofAlarms");
         onCreate(db);
     }
 
 
     public void addAlarm(String myTime, String type,Long myTimeinmili) {
-
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-
         contentValues.put("Time",myTime);
         contentValues.put("AlarmOrTimer",type);
         contentValues.put("iconId", R.drawable.ic_alarm_on_black_24dp);
         contentValues.put("TimeInMilli",myTimeinmili);
 
         db.insert("ListofAlarms",null,contentValues);
-        Log.d("DHANRAJ","check1");
         db.close();
-
     }
 
     public ArrayList<AlarmConstants> getDetailsOfAlarmAndTime(){
         SQLiteDatabase db = this.getWritableDatabase();
-
         myList.clear();
-
         Cursor cursor = db.query("ListofAlarms",new String[]{"_id",
                         "AlarmOrTimer","Time","iconId"},
                null,null,null,null,null);
 
-        if(cursor.moveToFirst())
-        {
-            do{
+        if(cursor.moveToFirst()) {
+            do {
                 AlarmConstants constants = new AlarmConstants();
-
                 constants.setMytime(cursor.getString(cursor.getColumnIndex("Time")));
                 constants.setAlarmKeyId(cursor.getInt(cursor.getColumnIndex("_id")));
                 constants.setType(cursor.getString(cursor.getColumnIndex("AlarmOrTimer")));
                 constants.setIconsIDs(cursor.getInt(cursor.getColumnIndex("iconId")));
                 myList.add(constants);
-
-            }while(cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
 
         db.close();
-
         return  myList;
-
     }
 
     public void deleteTheRow(int id) {
-
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("ListofAlarms","_id" +" = "+id,null);
         db.close();
     }
 
     public int getID() {
-
         SQLiteDatabase db = this.getWritableDatabase();
-
-
-        Cursor cursor = db.query("ListofAlarms",new String[]{"_id",
-                        },
+        Cursor cursor = db.query("ListofAlarms",new String[]{"_id",},
                 null,null,null,null,null);
-
         int id=0;
-
-        if(cursor.moveToFirst())
-        {
+        if(cursor.moveToFirst())  {
             do{
                id =  cursor.getInt(cursor.getColumnIndex("_id"));
 
-            }while(cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
-
         db.close();
-
         return  id;
     }
 
     public int getTime() {
         SQLiteDatabase db = this.getWritableDatabase();
-
-
-        Cursor cursor = db.query("ListofAlarms",new String[]{"TimeInMilli","_id"
-                },
+        Cursor cursor = db.query("ListofAlarms",new String[]{"TimeInMilli","_id"},
                 null,null,null,null,"TimeInMilli ASC");
 
         int id=0;
-
         if (cursor != null && cursor.moveToFirst()) {
             id = cursor.getInt(cursor.getColumnIndex("_id"));
-            Log.d("chechIDofalarm",String.valueOf(id));
         }
 
        /* if(cursor.moveToFirst())
@@ -146,22 +116,16 @@ public class DataBase extends SQLiteOpenHelper {
         }*/
 
         db.close();
-
-
-
         return id;
     }
 
     public void deleteTimeRow(int idtocancelled) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         db.delete("ListofAlarms","_id" +" = "+idtocancelled,null);
         db.close();
-
     }
 
-    public int getLastRowID()
-    {
+    public int getLastRowID() {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT ROWID from MYTABLE order by ROWID DESC limit 1";
         Cursor c = db.query("ListofAlarms",new String[]{"_id"},null,null,null,null,"_id DESC");
@@ -169,10 +133,6 @@ public class DataBase extends SQLiteOpenHelper {
         if (c != null && c.moveToFirst()) {
             lastId = c.getInt(0);
         }
-
         return lastId;
     }
-
-
-
 }

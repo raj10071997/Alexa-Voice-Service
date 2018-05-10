@@ -50,5 +50,9 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:25.0.1'
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.mikepenz:iconics-core:2.8.4@aar'
+    implementation 'com.mikepenz:google-material-typeface:2.2.0.3.original@aar'
+    implementation 'com.mikepenz:community-material-typeface:1.5.54.2@aar'
+    implementation 'com.mikepenz:fontawesome-typeface:4.6.0.1@aar'
     testImplementation 'junit:junit:4.12'
 }

@@ -35,7 +35,6 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         int fakeId=0;
         db = new DataBase(AlarmService.this);
         alarmManager =  (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -43,16 +42,13 @@ public class AlarmService extends Service {
         if(intent.getExtras().getString("extra")!=null)
          state = intent.getExtras().getString("extra");
 
-
         if(state.equals("alarm on"))
             fakeId=1;
         else
             fakeId=0;
 
-        if(fakeId==0)
-        {
-            if(mediaPlayer!=null)
-            {
+        if(fakeId==0) {
+            if(mediaPlayer!=null) {
                 mediaPlayer.stop();
                 mediaPlayer.reset();
             }
@@ -66,16 +62,14 @@ public class AlarmService extends Service {
 
             db.deleteTimeRow(idtocancelled);
 
-
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(AlarmService.this, "Alarm has been cancelled !" +" "+String.valueOf(idtocancelled), Toast.LENGTH_SHORT).show();
                 }
             });
-
         }
-        if(fakeId==1){
+        if (fakeId==1) {
             mediaPlayer = MediaPlayer.create(this, R.raw.alarm);
             mediaPlayer.start();
 
@@ -85,7 +79,6 @@ public class AlarmService extends Service {
             int idtocancelled = db.getTime();
             PendingIntent pendingIntent = PendingIntent.getBroadcast(AlarmService.this,idtocancelled,i,PendingIntent.FLAG_CANCEL_CURRENT);
 
-
             Notification notification_popu = new Notification.Builder(this)
                     .setContentTitle("Turn off the alarm!!")
                     .setContentText("Click me !")
@@ -94,10 +87,8 @@ public class AlarmService extends Service {
                     .setAutoCancel(true)
                     .build();
 
-
             notificationManager.notify(0,notification_popu);
         }
-
         return START_NOT_STICKY;
     }
 }

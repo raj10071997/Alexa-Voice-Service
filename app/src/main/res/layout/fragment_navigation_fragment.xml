@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
+    android:id="@+id/navigation_fragment_layout"
     android:orientation="vertical"
     tools:context="com.game.dhanraj.myownalexa.NavigationDrawer.NavigationFragment">
 
@@ -12,9 +13,7 @@
         android:orientation="horizontal"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="20dp"
-        android:gravity="center|left"
-        >
-
+        android:gravity="center|left">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_width="50dp"
@@ -79,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="25dp"
-            android:text="Alarms &amp; Timer"
+            android:text="Alarms &amp; Timers"
             android:textSize="20dp"
             android:textColor="@android:color/holo_blue_bright"
             />

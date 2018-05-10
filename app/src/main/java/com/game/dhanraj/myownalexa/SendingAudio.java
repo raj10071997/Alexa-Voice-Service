@@ -2,6 +2,7 @@ package com.game.dhanraj.myownalexa;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -10,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
@@ -23,7 +25,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -38,7 +39,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
-import com.game.dhanraj.myownalexa.NavigationDrawer.NavigationFragment;
 import com.game.dhanraj.myownalexa.RecordAudio.RecordAudioinBytes;
 import com.game.dhanraj.myownalexa.RecordAudio.RecorderConstants;
 import com.game.dhanraj.myownalexa.RecorderView.recorderView;
@@ -75,6 +75,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
 
+import static com.game.dhanraj.myownalexa.Constants.BASE_THEME;
+import static com.game.dhanraj.myownalexa.Constants.BASE_THEME_INTEGER;
+import static com.game.dhanraj.myownalexa.Constants.DARK_THEME;
 import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
 
 /**
@@ -85,7 +88,6 @@ public class SendingAudio extends AppCompatActivity {
 
     private Button btn;
     private recorderView record;
-   // private newMicroPhoneView mymicro;
     private RecorderConstants recorderConstants;
     public  RecordAudioinBytes recordAudioinBytes;
     private static final int AUDIO_RATE = 16000;
@@ -101,33 +103,33 @@ public class SendingAudio extends AppCompatActivity {
     private AlarmManager alarmManager;
     public TokenHandler tokenHandler;
     private Toolbar toolbar;
+    private int theme, themeInteger;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.send_audio_drawer);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar4);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-       tokenHandler = new TokenHandler(this);
-
+        getSupportActionBar().setTitle("Talk Box");
         stateofbtn = (TextView) findViewById(R.id.stateofbutton);
+        record = (recorderView) findViewById(R.id.sendAudiobtn);
+
+        SharedPreferences preferences = Util.getPrefernces(SendingAudio.this);
+        theme = preferences.getInt(BASE_THEME, ContextCompat.getColor(SendingAudio.this, R.color.light_background));
+        themeInteger = preferences.getInt(BASE_THEME_INTEGER, 1);
+        setUpLayout();
+
+        tokenHandler = new TokenHandler(this);
 
         down = new DownChannel();
         asyncDialog = new ProgressDialog(SendingAudio.this);
-
         mediaPlayer = new MediaPlayer();
-        record = (recorderView) findViewById(R.id.sendAudiobtn);
-
-        //mymicro = (newMicroPhoneView) findViewById(R.id.);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        NavigationFragment navigationFragment = (NavigationFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_fragment2);
-        navigationFragment.setUp(R.id.navigation_fragment2,(DrawerLayout)findViewById(R.id.drawer_layout2),toolbar);
 
         record.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -135,7 +137,6 @@ public class SendingAudio extends AppCompatActivity {
                 if (event.getAction() == MotionEvent.ACTION_DOWN ) {
                     if ( ContextCompat.checkSelfPermission(SendingAudio.this, Manifest.permission.RECORD_AUDIO  )
                             != PackageManager.PERMISSION_GRANTED) {
-
 
                         ActivityCompat.requestPermissions(SendingAudio.this,
                                 new String[]{Manifest.permission.RECORD_AUDIO},
@@ -146,25 +147,21 @@ public class SendingAudio extends AppCompatActivity {
                                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
                         if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
-
                             if (recordAudioinBytes == null) {
                                 //if mediaplayer is not playing
-                                if (!mediaPlayer.isPlaying() && checkRecordButton){
+                                if (!mediaPlayer.isPlaying() && checkRecordButton) {
                                     send();
                                     Toast.makeText(SendingAudio.this, "Speak", Toast.LENGTH_SHORT).show();
                                     checkRecordButton = false;
                                 }
                             }
-                        } else
-                        {
+                        } else {
                             Snackbar.make(v, "No Internet Connectivity", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
                     }
                     return true;
-                }else if(event.getAction() == MotionEvent.ACTION_UP)
-                {
-
+                } else if(event.getAction() == MotionEvent.ACTION_UP) {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
@@ -172,14 +169,13 @@ public class SendingAudio extends AppCompatActivity {
                     }
                     stopListening();
                     checkRecordButton=true;
+                    return true;
                 }
-
                 return false;
             }
         });
         EventBus.getDefault().post(new MessageEvent(TokenHandler.SplashActivity,"finishSplashActivity"));
         EventBus.getDefault().post(new MessageEvent(TokenHandler.FinishMainActivity,""));
-
     }
 
     @Override
@@ -191,27 +187,33 @@ public class SendingAudio extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                /*Intent i = new Intent(SendingAudio.this, MyAlarm.class);
-                startActivity(i);*/
+            case R.id.action_alarm:
+                Intent i = new Intent(SendingAudio.this, MyAlarm.class);
+                startActivity(i);
                 return true;
-
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
         Intent intent = new Intent(SendingAudio.this, DownChannel.class);
         SendingAudio.this.stopService(intent);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(SendingAudio.this, MainActivity.class);
+        startActivity(i);
+        finish();
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -228,7 +230,6 @@ public class SendingAudio extends AppCompatActivity {
                             checkRecordButton = false;
                         }
                     } else {
-
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
@@ -237,19 +238,16 @@ public class SendingAudio extends AppCompatActivity {
                         stopListening();
                         checkRecordButton=true;
                     }
-
                 } else {
-
                     if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                             Manifest.permission.RECORD_AUDIO)) {
-
                         new AlertDialog.Builder(this).
                                 setTitle("Record Audio Permission").
-                                setMessage("you need to grant this permission in order to record audio");
+                                setMessage("You need to grant this permission in order to record audio");
                     } else {
                         new AlertDialog.Builder(this)
                                 .setTitle("Record Audio Permission")
-                                .setMessage("you have denied this permission.Now you have to go to settings to enable it");
+                                .setMessage("You have denied this permission.Now you have to go to settings to enable it");
                     }
                 }
                 return;
@@ -261,10 +259,8 @@ public class SendingAudio extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("my-event"));
-
     }
 
     @Override
@@ -312,15 +308,12 @@ public class SendingAudio extends AppCompatActivity {
     }
 
     private void send() {
-
         recorderConstants = new RecorderConstants(AUDIO_RATE);
         if(recordAudioinBytes==null){
             recordAudioinBytes = new RecordAudioinBytes();
         }
         recordAudioinBytes.start();
-
         tokenHandler.getAccessToken(TokenHandler.SendAudioRequest);
-
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -341,7 +334,6 @@ public class SendingAudio extends AppCompatActivity {
         Log.d("sendAduioReqeust","sentit");
 
         try {
-
             header.put("namespace", "SpeechRecognizer");
             header.put("name","Recognize");
             header.put("messageId", Util.getUuid());
@@ -351,30 +343,20 @@ public class SendingAudio extends AppCompatActivity {
             payload.put("format","AUDIO_L16_RATE_16000_CHANNELS_1");
  //           payload.put("profile","NEAR_FIELD");
             payload.put("profile","FAR_FIELD");
-
             p.put("event",event);
-        }catch (JSONException e)
-        {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        if(accessToken==null)
-        {
+        if(accessToken==null) {
             Log.d("sendforrefreshtoken","refreshtoken");
-
             Toast.makeText(this, "First take authorization token for getting access token", Toast.LENGTH_SHORT).show();
-
-
-        }
-        else
-        {
+        } else {
             OkHttpClient okclient = getOkhttp();
-
             MultipartBody.Builder requestBdy = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("metadata","metadata", RequestBody.create(MediaType.parse("application/json; charset=UTF-8"), String.valueOf(p)))
                     .addFormDataPart("audio","application/octet-stream",requestBody);
-
 
             Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/events")
@@ -406,10 +388,8 @@ public class SendingAudio extends AppCompatActivity {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    if(response.isSuccessful())
-                    {
+                    if(response.isSuccessful()) {
                         Log.d("speechrecognizer","success");
-
                     }
                     try {
                       //  if (getBoundary(response) != null) {
@@ -435,13 +415,13 @@ public class SendingAudio extends AppCompatActivity {
                                         InputStream inputStreamObject = bodypart.getInputStream();
                                         BufferedReader streamReader = new BufferedReader(new InputStreamReader(inputStreamObject, "UTF-8"));
                                         StringBuilder responseStrBuilder = new StringBuilder();
-
                                         String inputStr;
                                         String token = null;
                                         String namespace = null;
                                         String name = null;
                                         String scheduledTime = null;
                                         String type = null;
+
                                         while ((inputStr = streamReader.readLine()) != null)
                                             responseStrBuilder.append(inputStr);
 
@@ -453,15 +433,12 @@ public class SendingAudio extends AppCompatActivity {
                                             JSONObject payload = (JSONObject) directive.get("payload");
                                             namespace = header.getString("namespace");
                                             name = header.getString("name");
-
                                             if (name.equals("StopCapture") && namespace.equals("SpeechRecognizer"))
                                                 stopListening();
                                             else if (name.equals("ExpectSpeech") && namespace.equals("SpeechRecognizer")) {
-
                                                 long timeoutInMilliseconds = payload.getLong("timeoutInMilliseconds");
                                                 Log.d("timeoutmsec", String.valueOf((timeoutInMilliseconds)));
                                                 checkforExpectSpeech = true;
-
                                             } else if (name.equals("Speak") && namespace.equals("SpeechSynthesizer")) {
                                                 Log.d("token", "SpeakDirective");
                                                 if (payload.getString("token") != null) {
@@ -472,7 +449,6 @@ public class SendingAudio extends AppCompatActivity {
                                                 String scheduledAlertTime = payload.getString("scheduledTime");
                                                 Log.d("AlertTimeis ", scheduledAlertTime);
                                             }
-
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
@@ -481,20 +457,14 @@ public class SendingAudio extends AppCompatActivity {
                                         Log.d("alert", bodypart.getContentType());
 
                                     } else if (contentType.equals("application/octet-stream") ){
-
                                         byte[] b = IOUtils.toByteArray(bodypart.getInputStream());
-
                                         playByteArray(b, null);
-
                                     }
-
                                 }
-                                if(checkforExpectSpeech)
-                                {
+                                if(checkforExpectSpeech) {
                                     send();
                                     checkforExpectSpeech=false;
                                 }
-
                             } catch (MessagingException e) {
                                 e.printStackTrace();
                                 Log.d("pooriAudioreceivenhihoi","ResponseFailed");
@@ -503,9 +473,8 @@ public class SendingAudio extends AppCompatActivity {
 
                         }
                     }catch (Exception e){
-
-                    }finally {
-
+                        //nothing specified
+                    } finally {
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {
@@ -513,15 +482,9 @@ public class SendingAudio extends AppCompatActivity {
                             }
                         });
                     }
-
-
-
                 }
             });
-
-
         }
-
     }
 
     private void sendExpectSpeechTimedOutEvent() {
@@ -529,9 +492,7 @@ public class SendingAudio extends AppCompatActivity {
         JSONObject event = new JSONObject();
         JSONObject header = new JSONObject();
         JSONObject payload = new JSONObject();
-
         try {
-
             header.put("namespace", "SpeechRecognizer");
             header.put("name", "ExpectSpeechTimedOut");
             header.put("messageId", Util.getUuid());
@@ -548,11 +509,9 @@ public class SendingAudio extends AppCompatActivity {
             sendExpectSpeechTimedOutEvent();
         else {
             OkHttpClient okclient = getOkhttp();
-
             MultipartBody.Builder requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("metadata", "metadata", RequestBody.create(MediaType.parse("application/json; charset=UTF-8"), String.valueOf(p)));
-
 
             Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/events")
@@ -562,13 +521,11 @@ public class SendingAudio extends AppCompatActivity {
                     .post(requestBody.build())
                     .build();
 
-
             okclient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     call.cancel();
                     Log.d("sendSpeechExpectTimOut","failed");
-
                 }
 
                 @Override
@@ -577,12 +534,9 @@ public class SendingAudio extends AppCompatActivity {
                         Log.d("sendSpeechExpectTimOut","successful");
 
                     Log.d("sendSpeechExpectTimOut",response.body().string());
-
                 }
             });
-
         }
-
     }
 
     private void SendSpeechFinishedEvent(String token,String accessToken) {
@@ -592,7 +546,6 @@ public class SendingAudio extends AppCompatActivity {
         JSONObject payload = new JSONObject();
 
         try {
-
             header.put("namespace", "SpeechSynthesizer");
             header.put("name", "SpeechFinished");
             header.put("messageId", Util.getUuid());
@@ -603,19 +556,15 @@ public class SendingAudio extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        p.toString();
-
-
+        //might not need the below statement
+       // p.toString();
         if (accessToken == null)
            tokenHandler.getAccessToken(TokenHandler.SendSpeechFinishedEvent);
         else {
-
             OkHttpClient okclient = getOkhttp();
-
             MultipartBody.Builder requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("metadata", "metadata", RequestBody.create(MediaType.parse("application/json; charset=UTF-8"), String.valueOf(p)));
-
 
             Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/events")
@@ -625,7 +574,6 @@ public class SendingAudio extends AppCompatActivity {
                     .post(requestBody.build())
                     .build();
 
-
             okclient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -633,7 +581,6 @@ public class SendingAudio extends AppCompatActivity {
                     Log.d("SendSpeechFinishedEvent","failed");
 
                 }
-
                 @Override
                 public void onResponse(Call call, final Response response) throws IOException {
                     if(response.isSuccessful()) {
@@ -641,10 +588,8 @@ public class SendingAudio extends AppCompatActivity {
                         if(response.header("name")!=null)
                         Log.d("headeroffinishedRequest",response.header("name"));
                     }
-
                 }
             });
-
         }
     }
 
@@ -655,7 +600,6 @@ public class SendingAudio extends AppCompatActivity {
         JSONObject payload = new JSONObject();
 
         try {
-
             header.put("namespace", "SpeechSynthesizer");
             header.put("name", "SpeechStarted");
             header.put("messageId", Util.getUuid());
@@ -666,19 +610,16 @@ public class SendingAudio extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        p.toString();
+        //p.toString();
         //String accesstoken = MainActivity.getAccessToken(SendingAudio.this);
 
         if (accessToken == null)
             tokenHandler.getAccessToken(TokenHandler.SendSpeechStartedEvent);
         else {
-
             OkHttpClient okclient = getOkhttp();
-
             MultipartBody.Builder requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("metadata", "metadata", RequestBody.create(MediaType.parse("application/json; charset=UTF-8"), String.valueOf(p)));
-
 
             Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/events")
@@ -696,15 +637,12 @@ public class SendingAudio extends AppCompatActivity {
                     Log.d("SendSpeechStartedEvent","failed");
 
                 }
-
                 @Override
                 public void onResponse(Call call, final Response response) throws IOException {
                     if(response.isSuccessful())
                         Log.d("speechstartedrequest","successful");
                     if(response.header("name")!=null)
                         Log.d("speechstartedrequest",response.header("name"));
-
-
                 }
             });
 
@@ -716,7 +654,6 @@ public class SendingAudio extends AppCompatActivity {
         public void onCompletion(MediaPlayer mp) {
            /* if(tokenfrompayload!=null)
                 SendSpeechFinishedEvent(tokenfrompayload);*/
-
         }
     };
 
@@ -727,8 +664,6 @@ public class SendingAudio extends AppCompatActivity {
 //                SendSpeechStartedEvent(tokenfrompayload);
         }
     };
-
-
 
     private void playByteArray(byte[] mp3SoundByteArray,String token) {
         try {
@@ -746,8 +681,6 @@ public class SendingAudio extends AppCompatActivity {
                 tokenHandler.getAccessToken(TokenHandler.SendSpeechStartedEvent);
 
             mediaPlayer.prepare();
-
-
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
@@ -768,12 +701,10 @@ public class SendingAudio extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-
             mediaPlayer.stop();
 
             if(tokenfrompayload!=null)
                 tokenHandler.getAccessToken(TokenHandler.SendSpeechFinishedEvent);
-
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
@@ -783,25 +714,19 @@ public class SendingAudio extends AppCompatActivity {
                 }
             });
 
-
-
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-
-
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(SendingAudio.this, "you can send another request or can send the previous request if you didn't get any response",
+                    Toast.makeText(SendingAudio.this, "You can send another request or can send the previous request if you didn't get any response",
                             Toast.LENGTH_SHORT).show();
                 }
             });
-
-
 
            /* new AsyncTask<Void, Void, Void>(){
                 @Override
@@ -850,8 +775,6 @@ public class SendingAudio extends AppCompatActivity {
             String s = ex.toString();
             ex.printStackTrace();
         }
-
-
     }
 
    /* private void sendPlaybackStartedEvent(float percent) {
@@ -916,9 +839,7 @@ public class SendingAudio extends AppCompatActivity {
         }
     }*/
 
-
     public String getBoundary(Response response) throws IOException {
-
         String header = response.header("content-type");
         String boundary = "";
 
@@ -929,14 +850,11 @@ public class SendingAudio extends AppCompatActivity {
                 boundary = matcher.group(1);
             }
         } else {
-
             Log.i("noboundary", "Body");
-
-           String printmy =  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
+            String printmy =  System.setProperty("mail.mime.multipart.ignoreexistingboundaryparameter", "true");
             Log.d("system",printmy);
         }
         return boundary;
-
     }
 
     private RequestBody requestBody = new RequestBody() {
@@ -944,13 +862,11 @@ public class SendingAudio extends AppCompatActivity {
         public MediaType contentType() {
             return MediaType.parse("application/octet-stream");
         }
-
         @Override
         public void writeTo(BufferedSink sink) throws IOException {
             //recordAudioinBytes.isPausing() changing this
            // while(recordAudioinBytes!=null && !recordAudioinBytes.isPausing())
-            while(recordAudioinBytes!=null)
-            {
+            while(recordAudioinBytes!=null) {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
@@ -958,7 +874,7 @@ public class SendingAudio extends AppCompatActivity {
                         stateofbtn.setText("Listening...");
                     }
                 });
-                if(recordAudioinBytes!=null){
+                if(recordAudioinBytes!=null) {
                     final float rmsdb = recordAudioinBytes.getRmsdb();
                     if(record != null) {
                         record.post(new Runnable() {
@@ -967,9 +883,7 @@ public class SendingAudio extends AppCompatActivity {
                                 record.setRmsdbLevel(rmsdb);
                             }
                         });
-                    }
-                    if(sink!=null && recordAudioinBytes!=null)
-                    {
+                    } if(sink!=null && recordAudioinBytes!=null) {
                         sink.write(recordAudioinBytes.consumeRecording());
                     }
                 }
@@ -981,7 +895,6 @@ public class SendingAudio extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-
         }
     };
 
@@ -1001,5 +914,15 @@ public class SendingAudio extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("ResourceAsColor")
+    private void setUpLayout() {
+        findViewById(R.id.send_audio_layout).setBackgroundColor(theme);
+        int oppositeTheme;
+        if (themeInteger == DARK_THEME)
+            oppositeTheme = ContextCompat.getColor(SendingAudio.this, R.color.light_background);
+        else
+            oppositeTheme = ContextCompat.getColor(SendingAudio.this, R.color.dark_background);
+        stateofbtn.setTextColor(oppositeTheme);
+    }
 
 }

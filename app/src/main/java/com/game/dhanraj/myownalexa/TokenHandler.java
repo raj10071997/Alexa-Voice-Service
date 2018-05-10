@@ -3,10 +3,7 @@ package com.game.dhanraj.myownalexa;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 import com.google.gson.Gson;
@@ -23,9 +20,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.game.dhanraj.myownalexa.MainActivity.PREF_ACCESS_TOKEN;
-import static com.game.dhanraj.myownalexa.MainActivity.PREF_REFRESH_TOKEN;
-import static com.game.dhanraj.myownalexa.MainActivity.PREF_TOKEN_EXPIRES;
+import static com.game.dhanraj.myownalexa.Constants.PREF_ACCESS_TOKEN;
+import static com.game.dhanraj.myownalexa.Constants.PREF_REFRESH_TOKEN;
+import static com.game.dhanraj.myownalexa.Constants.PREF_TOKEN_EXPIRES;
 import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
 
 /**
@@ -34,12 +31,11 @@ import static com.game.dhanraj.myownalexa.sharedpref.Util.getOkhttp;
 
 public class TokenHandler {
 
-
-
     public Context myContext;
     public String myresponse;
     private String REFRESH_TOKEN;
     private String ACCESS_TOKEN;
+
     public static final int FirstMainActivityDoPostRequest = 101;
     public static final int DownChannelCase1 = 102;
     public static final int DownChannelCase2 = 103;
@@ -50,7 +46,6 @@ public class TokenHandler {
     public static final int SendPlaybackStartedEvent = 108;
     public static final int SplashActivity = 109;
     public static final int FinishMainActivity = 110;
-
 
     public TokenHandler(Context context) {
         myContext = context;
@@ -67,14 +62,11 @@ public class TokenHandler {
               //  return preferences.getString(PREF_ACCESS_TOKEN, null);
                 String accessToken = preferences.getString(PREF_ACCESS_TOKEN,null);
                 EventBus.getDefault().post(new MessageEvent(event,accessToken));
-
             } else {
                 //if it is expired but we have a refresh token, get a new token
-
                 if (preferences.contains(PREF_REFRESH_TOKEN)) {
                     Log.d("expired","doesnotcontains");
                     getRefreshToken(preferences.getString(PREF_REFRESH_TOKEN, ""),event);
-
                 }
             }
         }
@@ -88,20 +80,15 @@ public class TokenHandler {
                 .add("client_id", Util.getPrefernces(myContext).getString("clientId",""))
                 .build();
         doPostRequest(formBody,event);
-
     }
 
     public void doPostRequest(final RequestBody form, final int checkRefreshTokenEvent) {
-
         OkHttpClient okclient = getOkhttp();
         Request request = new Request.Builder()
                 .url("https://api.amazon.com/auth/O2/token")
                 .post(form)
                 .build();
         Response response=null;
-
-
-
         okclient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -109,30 +96,23 @@ public class TokenHandler {
                 Log.d("accessToken","failed");
                 doPostRequest(form,checkRefreshTokenEvent);
             }
-
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 SharedPreferences preferences = Util.getPrefernces(myContext);
                 myresponse = response.body().string();
-
-
                 TokenResponse tokenResponse = new Gson().fromJson(myresponse, TokenResponse.class);
                 saveToken(tokenResponse);
-
-                if(checkRefreshTokenEvent==FirstMainActivityDoPostRequest)
-                {
+                if(checkRefreshTokenEvent==FirstMainActivityDoPostRequest) {
                     Intent st = new Intent(myContext,DownChannel.class);
                     myContext.startService(st);
-                }else
+                } else
                     EventBus.getDefault().post(new MessageEvent(checkRefreshTokenEvent,preferences.getString(PREF_ACCESS_TOKEN,null)));
-
             }
         });
     }
 
 
     public void saveToken(final TokenResponse tokenResponse) {
-
         REFRESH_TOKEN = tokenResponse.refresh_token;
         ACCESS_TOKEN = tokenResponse.access_token;
         SharedPreferences.Editor preferences = Util.getPrefernces(myContext).edit();
@@ -140,14 +120,12 @@ public class TokenHandler {
         preferences.putString(PREF_REFRESH_TOKEN, REFRESH_TOKEN);
         //comes back in seconds, needs to be milis
         preferences.putLong(PREF_TOKEN_EXPIRES, (System.currentTimeMillis() + tokenResponse.expires_in * 1000));
-
        /* new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 Toast.makeText(myContext, String.valueOf(tokenResponse.expires_in) , Toast.LENGTH_SHORT).show();
             }
         });*/
-
         preferences.apply();
     }
 
@@ -158,5 +136,4 @@ public class TokenHandler {
         public String token_type;
         public long expires_in;
     }
-
 }

@@ -4,37 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#8e24aa">
-
+    android:layout_height="match_parent">
 
     <include
         layout="@layout/toolbar"
-        android:id="@+id/toolbar4"/>
+        android:id="@+id/toolbar"/>
 
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawer_layout2"
+    <include
+        layout="@layout/send_audio"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-
-        <include
-            layout="@layout/send_audio"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <fragment
-            android:id="@+id/navigation_fragment2"
-            android:layout_width="@dimen/nav_drawer_width"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:layout="@layout/fragment_navigation_fragment"
-            android:name="com.game.dhanraj.myownalexa.NavigationDrawer.NavigationFragment"
-            tools:layout="@layout/fragment_navigation_fragment" />
-
-
-    </android.support.v4.widget.DrawerLayout>
-
-
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

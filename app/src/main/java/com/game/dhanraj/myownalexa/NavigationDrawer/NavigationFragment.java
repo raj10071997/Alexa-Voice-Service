@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -18,8 +17,8 @@ import android.widget.LinearLayout;
 
 import com.game.dhanraj.myownalexa.AboutActivity;
 import com.game.dhanraj.myownalexa.Alarm.MyAlarm;
-import com.game.dhanraj.myownalexa.MainActivity;
 import com.game.dhanraj.myownalexa.R;
+import com.game.dhanraj.myownalexa.SettingsActivity;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 
 /**
@@ -27,11 +26,9 @@ import com.game.dhanraj.myownalexa.sharedpref.Util;
  */
 public class NavigationFragment extends Fragment {
 
-
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
-    private View containerView;
-    private LinearLayout about,login,settings,timersAndAlarm;
+    private boolean BoolAbout = false, BoolLogin = false, BoolSettings = false, BoolTimersAndAlarms = false;
 
     public static final String KEY_USER_LEARNED_DRAWER="user_learned_drawer";
 
@@ -47,10 +44,8 @@ public class NavigationFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mUserLearnedDrawer = Boolean.valueOf(readFromPreferences(getActivity(),KEY_USER_LEARNED_DRAWER,"false"));
-        if(savedInstanceState!=null)
-        {
+        if(savedInstanceState!=null) {
             mFromSavedInstanceState=true;
         }
     }
@@ -61,39 +56,38 @@ public class NavigationFragment extends Fragment {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_navigation_fragment, container, false);
 
-        about = (LinearLayout) layout.findViewById(R.id.about);
+        LinearLayout about = (LinearLayout) layout.findViewById(R.id.about);
         about.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getActivity(), AboutActivity.class);
-                startActivity(i);
+                BoolAbout = true;
+                mDrawerLayout.closeDrawers();
             }
         });
 
-        timersAndAlarm = (LinearLayout) layout.findViewById(R.id.alarmsAndTimer);
-        timersAndAlarm.setOnClickListener(new View.OnClickListener() {
+        LinearLayout timersAndAlarms = (LinearLayout) layout.findViewById(R.id.alarmsAndTimer);
+        timersAndAlarms.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getActivity(), MyAlarm.class);
-                startActivity(i);
+                BoolTimersAndAlarms = true;
+                mDrawerLayout.closeDrawers();
             }
         });
 
-        login = (LinearLayout)layout.findViewById(R.id.login);
+        LinearLayout login = (LinearLayout) layout.findViewById(R.id.login);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getActivity(),MainActivity.class);
-                startActivity(i);
-                getActivity().finish();
+               mDrawerLayout.closeDrawers();
             }
         });
 
-        settings = (LinearLayout)layout.findViewById(R.id.settings);
+        LinearLayout settings = (LinearLayout) layout.findViewById(R.id.settings);
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: make settings activity
+                BoolSettings = true;
+                mDrawerLayout.closeDrawers();
             }
         });
 
@@ -101,37 +95,45 @@ public class NavigationFragment extends Fragment {
     }
 
     public void setUp(int fragmentId,DrawerLayout drawerLayout,Toolbar toolbar) {
-         containerView = getActivity().findViewById(fragmentId);
+        View containerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
         mDrawerToggle = new ActionBarDrawerToggle(getActivity(),drawerLayout,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close){
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                if(mUserLearnedDrawer==false)
-                {
-                    mUserLearnedDrawer=true;
+                if(!mUserLearnedDrawer) {
+                    mUserLearnedDrawer = true;
                     saveToPreferences(getActivity(),KEY_USER_LEARNED_DRAWER, String.valueOf(mUserLearnedDrawer));
                 }
-//                getActivity().getActionBar().setTitle("dhanraj sahu");
                 getActivity().invalidateOptionsMenu();
             }
-
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
+
+                Intent i = null;
+                if(BoolAbout) {
+                    BoolAbout = false;
+                    i = new Intent(getActivity(), AboutActivity.class);
+                    startActivity(i);
+                } else if (BoolTimersAndAlarms) {
+                    BoolTimersAndAlarms = false;
+                    i = new Intent(getActivity(), MyAlarm.class);
+                    startActivity(i);
+                } else if (BoolSettings) {
+                    BoolSettings = false;
+                    i = new Intent(getActivity(), SettingsActivity.class);
+                    startActivity(i);
+                }
                 getActivity().invalidateOptionsMenu();
             }
         };
-        if(!mFromSavedInstanceState && !mUserLearnedDrawer)
-        {
+        if(!mFromSavedInstanceState && !mUserLearnedDrawer) {
             mDrawerLayout.openDrawer(containerView);
         }
 
-        //it is deprecated find new method or way
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
        // mDrawerToggle.syncState();
-
         mDrawerLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -140,18 +142,14 @@ public class NavigationFragment extends Fragment {
         });
     }
 
-    public static void saveToPreferences(Context context,String preferenceName, String preferenceValue)
-    {
+    public static void saveToPreferences(Context context,String preferenceName, String preferenceValue) {
         SharedPreferences.Editor preferences = Util.getPrefernces(context).edit();
         preferences.putString(preferenceName,preferenceValue);
         preferences.apply();
     }
 
-    public static String readFromPreferences(Context context,String preferenceName, String defaultValue)
-    {
+    public static String readFromPreferences(Context context,String preferenceName, String defaultValue) {
         SharedPreferences preferences = Util.getPrefernces(context);
-        return preferences.getString(preferenceName,defaultValue);
-
+        return preferences.getString(preferenceName, defaultValue);
     }
-
 }
