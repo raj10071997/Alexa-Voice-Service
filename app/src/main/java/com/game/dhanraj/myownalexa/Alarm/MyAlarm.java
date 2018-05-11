@@ -3,7 +3,6 @@ package com.game.dhanraj.myownalexa.Alarm;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -19,15 +18,15 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 
+import com.game.dhanraj.myownalexa.ClickListener;
 import com.game.dhanraj.myownalexa.DatabaseForAlarmAndTimer.DataBase;
 import com.game.dhanraj.myownalexa.DownChannel;
 import com.game.dhanraj.myownalexa.R;
+import com.game.dhanraj.myownalexa.RecyclerTouchListener;
 import com.game.dhanraj.myownalexa.sharedpref.Util;
 
 import static com.game.dhanraj.myownalexa.Constants.BASE_THEME;
@@ -40,10 +39,10 @@ import static com.game.dhanraj.myownalexa.Constants.BASE_THEME_INTEGER;
 public class MyAlarm extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private RecyclerViewForAlarmAndTimer recyclerViewForAlarmAndTimer;
+    private RecyclerViewForAlarmAndTimerAdapter recyclerViewForAlarmAndTimerAdapter;
     private DataBase db;
     private int idtoDelete;
-    private RecyclerViewForAlarmAndTimer.ViewHolder myView;
+    private RecyclerViewForAlarmAndTimerAdapter.ViewHolder myView;
     private AlarmManager alarmManager;
     private DownChannel downChannel;
     private boolean mBounded;
@@ -77,8 +76,8 @@ public class MyAlarm extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        recyclerViewForAlarmAndTimer = new RecyclerViewForAlarmAndTimer(this);
-        recyclerView.setAdapter(recyclerViewForAlarmAndTimer);
+        recyclerViewForAlarmAndTimerAdapter = new RecyclerViewForAlarmAndTimerAdapter(this);
+        recyclerView.setAdapter(recyclerViewForAlarmAndTimerAdapter);
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(itemDecoration);
@@ -92,7 +91,7 @@ public class MyAlarm extends AppCompatActivity {
 
             @Override
             public void onLongClick(View view, int position) {
-            AlarmConstants myconst = recyclerViewForAlarmAndTimer.getItem(position);
+                AlarmConstants myconst = recyclerViewForAlarmAndTimerAdapter.getItem(position);
                 prompts(myconst.getAlarmKeyId(),position,view);
             }
         }));
@@ -145,53 +144,6 @@ public class MyAlarm extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static interface ClickListener{
-        public void onClick(View view, int position);
-        public void onLongClick(View view,int position);
-    }
-
-    class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
-        private ClickListener clicklistener;
-        private GestureDetector gestureDetector;
-
-        public RecyclerTouchListener(Context context, final RecyclerView recycleView, final ClickListener clicklistener){
-            this.clicklistener=clicklistener;
-            gestureDetector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
-                }
-
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    View child=recycleView.findChildViewUnder(e.getX(),e.getY());
-                    if(child!=null && clicklistener!=null){
-                        clicklistener.onLongClick(child,recycleView.getChildAdapterPosition(child));
-                    }
-                }
-            });
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-            View child=rv.findChildViewUnder(e.getX(),e.getY());
-            if(child!=null && clicklistener!=null && gestureDetector.onTouchEvent(e)){
-                clicklistener.onClick(child,rv.getChildAdapterPosition(child));
-            }
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-        }
-    }
-
     public void prompts(final int ID, final int position, final View view)
     {
         LayoutInflater li = LayoutInflater.from(MyAlarm.this);
@@ -236,13 +188,13 @@ public class MyAlarm extends AppCompatActivity {
       //  PendingIntent pendingIntent = PendingIntent.getBroadcast(MyAlarm.this,ID,i,PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent.getBroadcast(MyAlarm.this,ID,i,PendingIntent.FLAG_CANCEL_CURRENT).cancel();
         //alarmManager.cancel(pendingIntent);
-        Snackbar.make(view, "No Internet Connectivity", Snackbar.LENGTH_LONG)
+        Snackbar.make(view, "Alarm Deleted", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         refreshData();
     }
 
     private void refreshData() {
-        recyclerViewForAlarmAndTimer = new RecyclerViewForAlarmAndTimer(this);
-        recyclerView.swapAdapter(recyclerViewForAlarmAndTimer,false);
+        recyclerViewForAlarmAndTimerAdapter = new RecyclerViewForAlarmAndTimerAdapter(this);
+        recyclerView.swapAdapter(recyclerViewForAlarmAndTimerAdapter,false);
     }
 }

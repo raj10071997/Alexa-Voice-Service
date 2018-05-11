@@ -42,7 +42,8 @@
         </receiver>
         <receiver android:name=".Alarm.AlarmReceiver" />
 
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".LoginWebViewActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -75,18 +76,22 @@
                     android:scheme="amzn" />
             </intent-filter>
         </activity>
-        <activity android:name=".SendingAudio" />
-        <activity android:name=".SplashActivitiy">
+        <activity android:name=".SendingAudio"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SplashActivitiy"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AboutActivity" />
+        <activity android:name=".AboutActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".SettingsActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".RingtonesActivity"></activity>
+        <activity android:name=".RingtonesActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

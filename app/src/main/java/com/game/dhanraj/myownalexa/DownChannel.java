@@ -185,7 +185,7 @@ public class DownChannel extends Service {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    new AsyncTask<Void, Void, Void>(){
+                     new AsyncTask<Void, Void, Void>(){
                         @Override
                         protected Void doInBackground(Void... params) {
                           //  SendSynchronizeEvent();
@@ -201,9 +201,7 @@ public class DownChannel extends Service {
                             Toast.makeText(DownChannel.this, "DownChannel has been established", Toast.LENGTH_SHORT).show();
                         }
                     });
-                  //  StringBuilder stringBuilder = new StringBuilder();
                     BufferedSource bufferedSource = response.body().source();
-                   // Buffer buffer = new Buffer();
                     try {
                         while (!bufferedSource.exhausted()) {
                         String line = bufferedSource.readUtf8Line();
@@ -227,17 +225,9 @@ public class DownChannel extends Service {
                                                     String scheduledTime = payload.getString("scheduledTime");
                                                     String TYPE = payload.getString("type");
                                                     Log.d("time",scheduledTime);
-                                                    // Calendar calendar = javax.xml.bind.DatatypeConverter.parseDateTime(scheduledTime);
-                                                    //"yyyy-MM-dd'T'HH:mm:ss.SSSZ",yyyy-MM-dd'T'HH:mm:ss'
-
                                                     DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
-                                                    //  DateFormat fmt2 = new SimpleDateFormat("HH:mm:ss", Locale.US);
-
-                                                    //  DateFormat fmt = DateFormat.getTimeInstance(DateFormat.LONG, Locale.US);
-
                                                     try {
                                                         Date dhanraj = fmt.parse(scheduledTime);
-                                                        //String dhanraj2 = fmt.format(scheduledTime);
                                                         Long time =  dhanraj.getTime();
                                                         Log.d("Mytime",time.toString());
                                                         calendar.setTimeInMillis(time);
@@ -247,18 +237,6 @@ public class DownChannel extends Service {
                                                         int minute = calendar.get(Calendar.MINUTE);
                                                         int year = calendar.get(Calendar.YEAR);
                                                         int AMorPM = calendar.get(Calendar.AM_PM);
-                                                        //  calendar.set(Calendar.HOUR,calendar.get(Calendar.HOUR)-7);
-                                                        /*if(hour<=0)
-                                                        {
-                                                            hour = 12+hour;
-                                                            if(AMorPM==1)
-                                                                AMorPM =0;
-                                                            else
-                                                                AMorPM = 1;
-                                                        }*/
-                                                       /* calendar2.set(Calendar.HOUR,hour);
-                                                        calendar2.set(Calendar.MINUTE,minute);
-                                                        calendar2.set(Calendar.AM_PM,AMorPM);*/
                                                         String amOrpm = AMorPM==1? "pm":"am";
                                                         String min = String.valueOf(minute);
                                                         if(minute/10==0) {
@@ -269,12 +247,9 @@ public class DownChannel extends Service {
                                                         db.addAlarm(myTime,TYPE,calendar.getTimeInMillis());
                                                         int lastId = db.getLastRowID();
                                                         Log.d("lastrowID", String.valueOf(lastId));
-                                                        // int pendingId = (int) (calendar.getTimeInMillis()/10000);
-                                                        Log.d("mywholeTime",hour+","+minute+","+year+","+calendar.get(Calendar.AM_PM));
+                                                        Log.d("wholeTime",hour+","+minute+","+year+","+calendar.get(Calendar.AM_PM));
                                                         pending = PendingIntent.getBroadcast(DownChannel.this,lastId,intet,PendingIntent.FLAG_UPDATE_CURRENT);
-                                                        //calendar2 use karna tha lekin calendar use kar raha hu
                                                         alarmManager.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pending);
-                                                       //   Log.d("dhanrajtime",dhanraj2);
                                                     } catch (ParseException e) {
                                                         e.printStackTrace();
                                                         Log.d("ParsingException","DownnChannelException");
@@ -313,7 +288,6 @@ public class DownChannel extends Service {
         }
         return true;
     }
-
 
     private void SendSynchronizeEvent(final String accessToken) {
 
@@ -354,7 +328,6 @@ public class DownChannel extends Service {
             audioPayload.put("playerActivity","IDLE");
             audioPayload.put("token","");
 
-
             AlertState.put("header",alertHeader);
             AlertState.put("payload",alertPayload);
             alertHeader.put("name","AlertsState");
@@ -382,13 +355,11 @@ public class DownChannel extends Service {
 //            speechRecognizerHeader.put("name","Recognize");
 //            speechRecognizerHeader.put("namespace","SpeechRecognizer");
 
-
             context.put(AudioPlayer);
             context.put(AlertState);
             context.put(SpeakerState);
             context.put(SpeechSynthesizer);
           //  context.put(SpeechRecognizer);
-
 
             header.put("namespace", "System");
             header.put("name","SynchronizeState");
@@ -400,7 +371,6 @@ public class DownChannel extends Service {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        p.toString();
         if(accessToken==null)
             SendSynchronizeEvent(accessToken);
         else {
@@ -443,7 +413,6 @@ public class DownChannel extends Service {
         if(accessToken==null)
             SendPingRequest(accessToken);
         else {
-
             final Request request = new Request.Builder()
                     .url("https://avs-alexa-eu.amazon.com/v20160207/ping")
                     .get()
@@ -481,7 +450,6 @@ public class DownChannel extends Service {
         intent.putExtra("message", "stop");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
-
 
     public void cancelPendingIntent(int id) {
         Intent i = new Intent(DownChannel.this, AlarmReceiver.class);

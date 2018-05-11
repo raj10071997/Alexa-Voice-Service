@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.game.dhanraj.myownalexa.DatabaseForAlarmAndTimer.DataBase;
 import com.game.dhanraj.myownalexa.R;
+import com.game.dhanraj.myownalexa.sharedpref.Util;
 
 /**
  * Created by Dhanraj on 10-06-2017.
@@ -70,7 +71,13 @@ public class AlarmService extends Service {
             });
         }
         if (fakeId==1) {
-            mediaPlayer = MediaPlayer.create(this, R.raw.alarm);
+            String ringName = Util.getPrefernces(getApplicationContext()).getString("SelectedRingtone", "alarm.mp3");
+            int iend = ringName.indexOf(".");
+            if(iend!=-1)
+                ringName = ringName.substring(0,iend);
+
+            int ringtoneName = getResources().getIdentifier(ringName, "raw", getPackageName());
+            mediaPlayer = MediaPlayer.create(this, ringtoneName);
             mediaPlayer.start();
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
