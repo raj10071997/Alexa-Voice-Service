@@ -37,5 +37,5 @@
    
    You can delete the alarm from the list by long pressing the desired alarm.
    
-***The application is completely build from the AVS Documentation***  
+***The application is completely build from the AVS Documentation.***  
  
