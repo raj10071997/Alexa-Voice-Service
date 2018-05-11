@@ -1,4 +1,4 @@
-# My Own Alexa
+# MyOwnAlexa
 *An Android application which gives you your own Artificial Personal Assistant - **ALEXA***
 <p align="center">
 <img src="Screenshots/collage.png" height = "600" width="750"> 
@@ -38,4 +38,8 @@
    You can delete the alarm from the list by long pressing the desired alarm.
    
 ***The application is completely build from the AVS Documentation.***  
+
+## License
+
+MyOwnAlexa is under **MIT License**.
  
