@@ -2,6 +2,7 @@ package com.game.dhanraj.myownalexa;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -18,6 +19,10 @@ import com.game.dhanraj.myownalexa.sharedpref.Util;
 import com.mikepenz.iconics.view.IconicsImageView;
 
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static com.game.dhanraj.myownalexa.Constants.BASE_THEME;
 import static com.game.dhanraj.myownalexa.Constants.BASE_THEME_INTEGER;
 import static com.game.dhanraj.myownalexa.Constants.DARK_THEME;
@@ -30,6 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private SharedPreferences sharedPreferences;
     public int theme, theme_integer;
+    private ArrayList<String> ringtones;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +56,8 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.ll_alarm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent i = new Intent(SettingsActivity.this, RingtonesActivity.class);
+                startActivity(i);
             }
         });
 
